@@ -20,6 +20,7 @@ Contém todo o código funcional em JavaScript Vanilla (ES6+), organizado para s
   * `ManaManager.js`: Controle dos 18 pontos de mana iniciais e custos.
   * `PuzzleLogic.js`: Lógica de alinhamento das engrenagens de Tenebra e outros puzzles futuros.
 * **scenes/**: Gerenciamento de contextos visuais.
+  * `SelectionScene.js`: A criação da cena de seleção de personagens.
   * `ExplorationScene.js`: O modo plataforma no Vazio e na Torre.
   * `BattleScene.js`: A arena de combate por turnos com zoom dramático que combinamos.
   * `HubScene.js`: O ambiente de descanso na Taverna.

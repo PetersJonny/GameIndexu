@@ -1,42 +1,45 @@
-export class Player { // Define e exporta a classe Player para criar o objeto do jogador
-    constructor() { // O construtor define as propriedades iniciais quando o jogador nasce
-        this.x = 100; // Posição horizontal inicial no mapa
-        this.y = 500; // Posição vertical inicial no mapa
-        this.width = 50;  // Largura do corpo do jogador (futuro tamanho da imagem/sprite)
-        this.height = 80; // Altura do corpo do jogador (futuro tamanho da imagem/sprite)
+export class Player {
+    constructor(color) {
+        this.x = 100; //Posição horizontal inicial no Vazio [cite: 3]
+        this.y = 500; //Posição vertical inicial acima da plataforma
+        this.width = 50; //Largura do retângulo (espaço para sua sprite futura)
+        this.height = 80; //Altura do retângulo (espaço para sua sprite futura)
+        this.color = color; //Cor definida pela escolha na SelectionScene
 
-        this.velocityX = 0; // Velocidade atual no eixo X (anda para os lados)
-        this.velocityY = 0; // Velocidade atual no eixo Y (sobe e desce)
-        this.speed = 5; // Velocidade máxima de caminhada
-        this.gravity = 0.5; // Força que puxa o jogador para baixo constantemente
-        this.jumpForce = -12; // A força aplicada para cima no momento do pulo (negativa sobe no Canvas)
-        this.isGrounded = false; // Booleano para saber se o jogador está tocando o chão
+        this.velocityX = 0; //Velocidade lateral atual
+        this.velocityY = 0; //Velocidade vertical (gravidade/pulo)
+        this.speed = 5; //Velocidade de caminhada pelo cenário
+        this.gravity = 0.5; //Força que puxa o herói para baixo constantemente
+        this.jumpForce = -12; //Força do impulso para desafiar a gravidade [cite: 10]
+        this.isGrounded = false; //Verifica se o herói está tocando o chão de pedra [cite: 5]
     }
 
-    update() { // Método que atualiza a lógica de física a cada quadro (frame) do jogo
-        // Aplica Gravidade constante
-        this.velocityY += this.gravity; // Soma a gravidade à velocidade vertical (aceleração de queda)
-        this.y += this.velocityY; // Move o jogador verticalmente com base na velocidade atual
-        this.x += this.velocityX; // Move o jogador horizontalmente com base na velocidade atual
+    update() {
+        this.velocityY += this.gravity; //Aplica a aceleração da gravidade [cite: 21]
+        this.y += this.velocityY; //Atualiza a posição vertical com base na velocidade
+        this.x += this.velocityX; //Atualiza a posição horizontal com base no input
 
-        // Chão temporário (O despertar na plataforma de pedra)
-        if (this.y + this.height > 600) { // Verifica se a base do jogador passou da altura 600 (o chão)
-            this.y = 600 - this.height; // Reposiciona o jogador exatamente em cima da linha do chão
-            this.velocityY = 0; // Zera a velocidade de queda para ele não atravessar o piso
-            this.isGrounded = true; // Confirma que o jogador está pisando em algo firme
+        // Lógica de colisão com o chão (Plataforma de Pedra de Marah) [cite: 3]
+        if (this.y + this.height > 600) {
+            this.y = 600 - this.height; //Mantém o herói exatamente sobre o chão
+            this.velocityY = 0; //Zera a velocidade de queda ao tocar a pedra
+            this.isGrounded = true; //Permite que o herói pule novamente [cite: 22]
         }
     }
 
-    draw(ctx) { // Método responsável por desenhar o jogador na tela
-        // Placeholder azul marinho (cor da Carta de Marfim)
-        ctx.fillStyle = '#000080'; // Define a cor do preenchimento como azul marinho
-        ctx.fillRect(this.x, this.y, this.width, this.height); // Desenha o retângulo do jogador nas coordenadas atuais
+    draw(ctx) {
+        // Desenha o retângulo colorido representando o doidão escolhido [cite: 80-85]
+        ctx.fillStyle = this.color; //Define a cor (Fogo, Metal, Madeira, etc)
+        ctx.fillRect(this.x, this.y, this.width, this.height); //Pinta o personagem na tela
+
+        // Espaço reservado para o desenho feito à mão futuramente
+        // ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height);
     }
 
-    jump() { // Método acionado para fazer o personagem pular
-        if (this.isGrounded) { // Só permite o pulo se o jogador estiver encostado no chão
-            this.velocityY = this.jumpForce; // Aplica a força negativa para lançar o jogador para cima
-            this.isGrounded = false; // Define que ele não está mais no chão (está no ar)
+    jump() {
+        if (this.isGrounded) {
+            this.velocityY = this.jumpForce; //Aplica o impulso para cima
+            this.isGrounded = false; //O herói agora está no ar [cite: 10]
         }
     }
 }

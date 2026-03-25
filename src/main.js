@@ -1,9 +1,7 @@
-import { Engine } from './core/Engine.js'; //Importa o motor principal do jogo
+import { Engine } from './core/Engine.js'; //Importa o motor
 
-// Espera o navegador carregar todo o HTML antes de iniciar
+// Garante que o DOM está pronto antes de iniciar
 window.addEventListener('load', () => {
-    const game = new Engine('gameCanvas'); //Cria a instância usando o ID correto
-    game.init().catch(err => { //Tenta inicializar o despertar no vazio [cite: 1]
-        console.error("Erro ao iniciar Marah:", err); //Exibe erro caso falhe
-    });
+    const game = new Engine('gameCanvas'); //Instancia o jogo
+    game.init().catch(err => console.error("Erro no Vazio:", err)); //Inicia
 });

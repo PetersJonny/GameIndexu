@@ -1,59 +1,56 @@
-import { AssetLoader } from '../utils/AssetLoader.js'; // Importa a ferramenta que carrega imagens e sons
+import { AssetLoader } from '../utils/AssetLoader.js'; //Importa o carregador de desenhos
+import { Player } from '../entities/Player.js'; //Importa a lógica da Íris/Atom
+import { InputHandler } from './InputHandler.js'; //Importa o leitor de teclado
 
-export class Engine { // Define a classe principal que controla o fluxo do jogo
-    constructor(canvasId) { // O construtor configura o ambiente inicial do jogo
-        this.canvas = document.getElementById(canvasId); // Busca o elemento HTML <canvas> onde o jogo aparece
-        this.ctx = this.canvas.getContext('2d'); // Pega o "pincel" (contexto) para desenhar em 2D
-        this.loader = new AssetLoader(); // Cria uma instância para carregar os arquivos do jogo
-        this.lastTime = 0; // Armazena o tempo do último quadro para calcular a fluidez (deltaTime)
-
-        // Estados: 'EXPLORATION' ou 'COMBAT'
-        this.gameState = 'EXPLORATION'; // Define se o jogador está andando pelo mapa ou lutando
-
-        // Configuração de tela para o Vazio
-        this.canvas.width = 1280; // Define a largura da tela do jogo (HD)
-        this.canvas.height = 720; // Define a altura da tela do jogo (HD)
+export class Engine {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId); //Busca o canvas no HTML
+        this.ctx = this.canvas.getContext('2d'); //Ativa o modo de desenho 2D
+        this.loader = new AssetLoader(); //Cria a instância do carregador
+        this.player = new Player(); //Cria o herói na plataforma inicial [cite: 3]
+        this.input = new InputHandler(this.player); //Conecta o teclado ao herói
+        this.lastTime = 0; //Armazena o tempo do último quadro
+        this.gameState = 'EXPLORATION'; //Define o estado inicial como exploração [cite: 10]
+        this.canvas.width = 1280; //Define a largura da tela de Marah
+        this.canvas.height = 720; //Define a altura da tela de Marah
     }
 
-    async init() { // Método de inicialização que carrega tudo antes de começar
-        // Exemplo de como a gente vai carregar nossas spritesheets depois
-        // await this.loader.loadImage('hero', '/assets/sprites/iris_sheet.png');
-        // await this.loader.loadImage('background', '/assets/backgrounds/vazio_marah.png');
-
-        this.start(); // Após carregar os recursos, chama o início do jogo
+    async init() {
+        // Espaço reservado para as spritesheets feitas à mão futuramente
+        // await this.loader.loadImage('player_sprite', '/assets/sprites/hero.png'); //Carregará a arte
+        this.start();//Inicia o loop do jogo
     }
 
-    start() { // Inicia o ciclo de vida do jogo
-        requestAnimationFrame(this.loop.bind(this)); // Pede ao navegador para rodar a função 'loop' o mais rápido possível
+    start() {
+        requestAnimationFrame(this.loop.bind(this)); //Chama o próximo quadro de animação
     }
 
-    loop(timestamp) { // O "batimento cardíaco" do jogo que roda infinitamente
-        const deltaTime = timestamp - this.lastTime; // Calcula quanto tempo passou desde o último quadro (ms)
-        this.lastTime = timestamp; // Atualiza o marcador de tempo para o próximo cálculo
-
-        this.update(deltaTime); // Processa toda a lógica (movimento, colisões, mana)
-        this.draw(); // Desenha tudo na tela após a lógica ser processada
-
-        requestAnimationFrame(this.loop.bind(this)); // Chama o próximo quadro do ciclo
+    loop(timestamp) {
+        const deltaTime = timestamp - this.lastTime; //Calcula a diferença de tempo
+        this.lastTime = timestamp; //Atualiza o tempo atual
+        this.update(deltaTime); //Processa a lógica (gravidade, movimento)
+        this.draw(); //Desenha tudo na tela
+        requestAnimationFrame(this.loop.bind(this)); //Mantém o jogo rodando a 60 FPS
     }
 
-    update(deltaTime) { // Onde a "mágica" da lógica acontece
-        // Lógica de movimento ou cartas baseada no estado
-        if (this.gameState === 'EXPLORATION') { // Se estiver explorando...
-            // Atualiza física das plataformas (pulos, gravidade, etc.)
-        } else if (this.gameState === 'COMBAT') { // Se estiver em luta...
-            // Atualiza lógica de turnos e mana (18 pontos)
+    update(deltaTime) {
+        if (this.gameState === 'EXPLORATION') {
+            this.player.update(); //Atualiza a física do herói no Vazio [cite: 13]
         }
     }
 
-    draw() { // Onde os visuais são renderizados
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Limpa a tela inteira para desenhar o novo quadro
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); //Limpa a tela anterior
+        this.ctx.fillStyle = '#FFFFFF'; //Define a cor do "Silêncio Branco" [cite: 2]
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); //Pinta o fundo de branco
 
-        // Renderiza o cenário ou a arena circular do Guardião
-        this.ctx.fillStyle = '#FFFFFF'; // Define a cor branca para o fundo (o "Silêncio Branco")
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // Pinta o fundo da tela
+        // Desenha o chão da plataforma de pedra [cite: 3]
+        this.ctx.fillStyle = '#444444'; //Cor cinza para a pedra
+        this.ctx.fillRect(0, 600, this.canvas.width, 120); //Desenha a plataforma base
 
-        this.ctx.fillStyle = 'black'; // Define a cor do texto como preto
-        this.ctx.fillText(`Estado: ${this.gameState}`, 20, 30); // Escreve na tela em qual estado o jogo está
+        this.player.draw(this.ctx); //Desenha o herói (atualmente um retângulo azul)
+
+        this.ctx.fillStyle = 'black'; //Cor do texto de debug
+        this.ctx.fillText(`Estado: ${this.gameState}`, 20, 30); //Mostra se estamos explorando ou lutando
     }
 }

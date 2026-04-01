@@ -29,5 +29,5 @@ export class ManaManager {
 
     get mana() {
         return this.currentMana; // valor atual de mana
-    }//8===============D
+    }
 }

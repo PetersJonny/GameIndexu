@@ -22,8 +22,7 @@ export class CardSystem { // Gerencia a lógica de combate com cartas entre joga
         //Mensagem do começo da bataha
         this.messages = [
             'Bem-vindo ao duelo de cartas!',
-            'Pressione 1-5 para usar cartas, R para comprar, E para terminar a vez.',
-            'B para iniciar outro duelo quando terminar.'
+            'Clique em uma carta ou pressione 1-5 para usá-la. R para comprar, E para terminar a vez.'
         ];
 
         this.drawCards(this.maxHandSize); // compra cartas iniciais
@@ -41,58 +40,40 @@ export class CardSystem { // Gerencia a lógica de combate com cartas entre joga
         const messages = this.player.drawCards(count, this.maxHandSize); // Compra cartas do deck do jogador
         messages.forEach((message) => this.addMessage(message)); // Adiciona mensagens de reshuffle ou compra
     }
-    //Define a raridade das cartas
+    // Define a raridade das cartas.
     getCardRarity(card) {
-        return CardSystem.calculateCardRarity(
-            card,
-            this.player ? this.player.maxHealth : 30,
-            this.manaManager ? this.manaManager.maxMana : 18
-        );
-    }
-
-    static calculateCardRarity(card, maxHealth = 30, maxMana = 18) {
-        // Valida se o objeto de carta existe e tem os atributos numéricos necessários.
-        if (!card || typeof card.cost !== 'number' || typeof card.value !== 'number') {
-            return 'Desconhecida'; // requer dados válidos para calcular raridade
-        }
-
-        const costScore = Math.min(Math.max(card.cost / 5, 0), 1); // custo é proporcional até 5
-        const valueScore = Math.min(Math.max(card.value / 12, 0), 1); // valor é proporcional até 12
-        const typeScore = CardSystem.getCardTypeScore(card.type); // valor do tipo da carta
-        const lifeScore = Math.min(Math.max(maxHealth / 40, 0), 1); // vida do personagem influencia raridade
-        const manaScore = Math.min(Math.max(maxMana / 24, 0), 1); // mana máxima também afeta a força percebida
-
-        const balanceScore = (costScore + valueScore + typeScore + lifeScore + manaScore) / 5; // média simples dos fatores
-
-        if (balanceScore >= 0.85) return 'Mítica';
-        if (balanceScore >= 0.7) return 'Lendária';
-        if (balanceScore >= 0.55) return 'Rara';
-        if (balanceScore >= 0.4) return 'Incomum';
-        return 'Comum';
-    }
-
-    // Dado o tipo da carta, retorna um multiplicador de valor para o cálculo de raridade.
-    static getCardTypeScore(type) {
-        const normalizedType = typeof type === 'string' ? type.toLowerCase() : '';
-        switch (normalizedType) {
-            case 'attack': return 1.0; // ataques têm maior impacto direto
-            case 'heal': return 0.95; // cura mantém o jogador vivo
-            case 'defend': return 0.9; // defesa reduz dano futuro
-            case 'mana': return 0.85; // mana é útil, mas menos diretamente ofensiva
-            default: return 0.75; // tipos desconhecidos recebem um valor neutro
+        if (card && typeof card.rarity === 'string' && card.rarity.trim().length > 0) {
+            return card.rarity;
         }
     }
+
 
     // Retorna a cor associada ao nível de raridade da carta para uso na UI.
     getCardRarityColor(card) {
         const rarity = this.getCardRarity(card);
         switch (rarity) {
-            case 'Mítica': return '#df1515';
             case 'Lendária': return '#D4AF37';
             case 'Rara': return '#3F51B5';
             case 'Incomum': return '#4CAF50';
             case 'Comum': return '#9E9E9E';
             default: return '#FFFFFF';
+        }
+    }
+
+    // Texto do efeito para exibir na carta
+    getCardEffectText(card) {
+        if (!card || !card.type || card.value === undefined) return 'Efeito desconhecido';
+        switch (card.type) {
+            case 'attack':
+                return `Dano: ${card.value}`;
+            case 'defend':
+                return `Escudo: ${card.value}`;
+            case 'heal':
+                return `Cura: ${card.value}`;
+            case 'mana':
+                return `Mana: +${card.value}`;
+            default:
+                return `Valor: ${card.value}`;
         }
     }
 

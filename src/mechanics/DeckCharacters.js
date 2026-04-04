@@ -1,4 +1,5 @@
 import { CardSystem } from './CardSystem.js';
+import { ManaManager } from './ManaManager.js';
 
 export class DeckCharacter {
     constructor(name, color, maxHealth = 30) {
@@ -6,6 +7,7 @@ export class DeckCharacter {
         this.color = color; // Cor associada ao personagem
         this.maxHealth = maxHealth; // Vida máxima do personagem
         this.health = maxHealth; // Vida atual
+        this.manaManager = new ManaManager(this.name); // Gerenciador de mana específico do personagem
         this.armor = 0; // Armadura usada para bloquear dano
         this.deck = []; // Baralho principal de cartas
         this.discardPile = []; // Pilha de cartas descartadas
@@ -18,11 +20,11 @@ export class DeckCharacter {
     //reseta os valores para cada inicio de combate
     resetCombat(maxHandSize = 5) {
         this.deck = this.createDeck(); // recria o deck na preparação para um novo duelo
-        this.assignCardRarities(); // atribui raridades automáticas antes de embaralhar
         this.shuffle(this.deck); // embaralha o deck criado
         this.discardPile = []; // limpa o descarte do combate anterior
         this.hand = []; // limpa a mão antes de comprar a nova mão inicial
         this.health = this.maxHealth; // restaura vida completa para o início do combate
+        this.manaManager.reset(); // restaura mana completa para o início do combate
         this.armor = 0; // zera armadura no começo do duelo
         this.drawCards(maxHandSize); // compra as cartas iniciais do jogador
     }
@@ -76,6 +78,27 @@ export class DeckCharacter {
     get isAlive() {
         return this.health > 0; // true enquanto o personagem ainda tiver vida
     }
+
+    // Métodos para gerenciamento de mana
+    canSpendMana(cost) {
+        return this.manaManager.canSpend(cost);
+    }
+
+    spendMana(cost) {
+        return this.manaManager.spend(cost);
+    }
+
+    restoreMana(amount) {
+        this.manaManager.restore(amount);
+    }
+
+    get currentMana() {
+        return this.manaManager.mana;
+    }
+
+    get maxMana() {
+        return this.manaManager.maxMana;
+    }
 }
 
 // Deck do personagem Íris Shadowlace com vida, cor e cartas específicas
@@ -86,11 +109,11 @@ export class ÍrisShadowlace extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Lamina de Fogo', type: 'attack', cost: 1, value: 6, desc: 'Ataque rápido com lâmina flamejante.' },
-            { id: 2, name: 'Sombra Curativa', type: 'heal', cost: 2, value: 7, desc: 'Recupera parte da sua vida.' },
-            { id: 3, name: 'Escudo Etéreo', type: 'defend', cost: 1, value: 5, desc: 'Ganha proteção mágica.' },
-            { id: 4, name: 'Chama Crescente', type: 'attack', cost: 3, value: 11, desc: 'Dano maior para desafiar inimigos.' },
-            { id: 5, name: 'Fluxo Arcano', type: 'mana', cost: 0, value: 3, desc: 'Restaura mana rapidamente.' }
+            { id: 1, name: 'Lamina de Fogo', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Ataque rápido com lâmina flamejante.' },
+            { id: 2, name: 'Sombra Curativa', type: 'heal', cost: 2, value: 7, rarity: 'Incomum', desc: 'Recupera parte da sua vida.' },
+            { id: 3, name: 'Escudo Etéreo', type: 'defend', cost: 1, value: 5, rarity: 'Comum', desc: 'Ganha proteção mágica.' },
+            { id: 4, name: 'Chama Crescente', type: 'attack', cost: 3, value: 11, rarity: 'Rara', desc: 'Dano maior para desafiar inimigos.' },
+            { id: 5, name: 'Fluxo Arcano', type: 'mana', cost: 0, value: 3, rarity: 'Incomum', desc: 'Restaura mana rapidamente.' }
         ];
     }
 }
@@ -102,11 +125,11 @@ export class AtomShadowlace extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Impacto Metálico', type: 'attack', cost: 1, value: 5, desc: 'Ataque concentrado de metal.' },
-            { id: 2, name: 'Barreira de Aço', type: 'defend', cost: 2, value: 7, desc: 'Aumenta a defesa instantaneamente.' },
-            { id: 3, name: 'Reator Energético', type: 'mana', cost: 0, value: 4, desc: 'Restaura mais mana.' },
-            { id: 4, name: 'Estilhaço', type: 'attack', cost: 2, value: 8, desc: 'Causa dano extra enquanto perfura.' },
-            { id: 5, name: 'Escudo Magnético', type: 'defend', cost: 1, value: 4, desc: 'Proteção que reduz dano.' }
+            { id: 1, name: 'Impacto Metálico', type: 'attack', cost: 1, value: 5, rarity: 'Comum', desc: 'Ataque concentrado de metal.' },
+            { id: 2, name: 'Barreira de Aço', type: 'defend', cost: 2, value: 7, rarity: 'Comum', desc: 'Aumenta a defesa instantaneamente.' },
+            { id: 3, name: 'Reator Energético', type: 'mana', cost: 0, value: 4, rarity: 'Incomum', desc: 'Restaura mais mana.' },
+            { id: 4, name: 'Estilhaço', type: 'attack', cost: 4, value: 8, rarity: 'Rara', desc: 'Causa dano extra enquanto perfura.' },
+            { id: 5, name: 'Escudo Magnético', type: 'defend', cost: 1, value: 4, rarity: 'Incomum', desc: 'Proteção que reduz dano.' }
         ];
     }
 }
@@ -118,11 +141,11 @@ export class Ioruh extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Rugido da Floresta', type: 'attack', cost: 2, value: 9, desc: 'Ajuda a ferir o inimigo com força bruta.' },
-            { id: 2, name: 'Proteção Natural', type: 'defend', cost: 1, value: 6, desc: 'Ganha armadura da floresta.' },
-            { id: 3, name: 'Sangue Vital', type: 'heal', cost: 2, value: 6, desc: 'Recupera energia vital do ambiente.' },
-            { id: 4, name: 'Golpe Selvagem', type: 'attack', cost: 3, value: 11, desc: 'Golpe forte que pode superar escudos.' },
-            { id: 5, name: 'Espírito da Madeira', type: 'mana', cost: 0, value: 2, desc: 'Restaura um pouco de mana.' }
+            { id: 1, name: 'Rugido da Floresta', type: 'attack', cost: 4, value: 8, rarity: 'Rara', desc: 'Ajuda a ferir o inimigo com força bruta.' },
+            { id: 2, name: 'Proteção Natural', type: 'defend', cost: 1, value: 6, rarity: 'Comum', desc: 'Ganha armadura da floresta.' },
+            { id: 3, name: 'Sangue Vital', type: 'heal', cost: 2, value: 6, rarity: 'Comum', desc: 'Recupera energia vital do ambiente.' },
+            { id: 4, name: 'Golpe Selvagem', type: 'attack', cost: 3, value: 6, rarity: 'Comum', desc: 'Golpe forte que pode superar escudos.' },
+            { id: 5, name: 'Espírito da Madeira', type: 'mana', cost: 0, value: 2, rarity: 'Incomum', desc: 'Restaura um pouco de mana.' }
         ];
     }
 }
@@ -134,11 +157,11 @@ export class Toshy extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Lança de Gelo', type: 'attack', cost: 1, value: 5, desc: 'Ataque rápido e preciso.' },
-            { id: 2, name: 'Placa Densa', type: 'defend', cost: 2, value: 6, desc: 'Cria uma defesa firme.' },
-            { id: 3, name: 'Corrente Azul', type: 'mana', cost: 0, value: 3, desc: 'Restaura energia mágica.' },
-            { id: 4, name: 'Descarga Fria', type: 'attack', cost: 3, value: 10, desc: 'Ataque poderoso que congela o inimigo.' },
-            { id: 5, name: 'Recarga', type: 'heal', cost: 2, value: 5, desc: 'Regenera parte da saúde.' }
+            { id: 1, name: 'Lança de Gelo', type: 'attack', cost: 1, value: 5, rarity: 'Comum', desc: 'Ataque rápido e preciso.' },
+            { id: 2, name: 'Placa Densa', type: 'defend', cost: 2, value: 6, rarity: 'Comum', desc: 'Cria uma defesa firme.' },
+            { id: 3, name: 'Corrente Azul', type: 'mana', cost: 0, value: 3, rarity: 'Incomum', desc: 'Restaura energia mágica.' },
+            { id: 4, name: 'Descarga Fria', type: 'attack', cost: 3, value: 10, rarity: 'Rara', desc: 'Ataque poderoso que congela o inimigo.' },
+            { id: 5, name: 'Recarga', type: 'heal', cost: 2, value: 5, rarity: 'Incomum', desc: 'Regenera parte da saúde.' }
         ];
     }
 }
@@ -150,11 +173,11 @@ export class Mogli extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Flechada', type: 'attack', cost: 1, value: 7, desc: 'Atira uma flecha no inimigo.' },
-            { id: 2, name: 'Mordida', type: 'attack', cost: 2, value: 4, desc: 'Morde o inimigo com ferocidade.' },
-            { id: 3, name: 'Pulo Ágil', type: 'defend', cost: 1, value: 5, desc: 'Desvia e ganha escudo rápido.' },
-            { id: 4, name: 'Alma da Folha', type: 'mana', cost: 0, value: 3, desc: 'Recupera mana com a força da floresta.' },
-            { id: 5, name: 'Encontrar erva', type: 'heal', cost: 3, value: 6, desc: 'Procura ervas para se curar.' }
+            { id: 1, name: 'Flechada', type: 'attack', cost: 1, value: 7, rarity: 'Comum', desc: 'Atira uma flecha no inimigo.' },
+            { id: 2, name: 'Mordida', type: 'attack', cost: 2, value: 4, rarity: 'Comum', desc: 'Morde o inimigo com ferocidade.' },
+            { id: 3, name: 'Pulo Ágil', type: 'defend', cost: 1, value: 5, rarity: 'Comum', desc: 'Desvia e ganha escudo rápido.' },
+            { id: 4, name: 'Alma da Folha', type: 'mana', cost: 0, value: 3, rarity: 'Incomum', desc: 'Recupera mana com a força da floresta.' },
+            { id: 5, name: 'Encontrar erva', type: 'heal', cost: 3, value: 6, rarity: 'Rara', desc: 'Procura ervas para se curar.' }
         ];
     }
 }
@@ -166,11 +189,11 @@ export class Thanatá extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Investida Dourada', type: 'attack', cost: 1, value: 6, desc: 'Ataque rápido que brilha como ouro.' },
-            { id: 2, name: 'Barreira de Moedas', type: 'defend', cost: 2, value: 6, desc: 'Escudo forjado em riquezas.' },
-            { id: 3, name: 'Tesouro Arcano', type: 'mana', cost: 0, value: 4, desc: 'Restaura mana com poder monetário.' },
-            { id: 4, name: 'Golpe Valioso', type: 'attack', cost: 3, value: 10, desc: 'Ataque forte com preço alto.' },
-            { id: 5, name: 'Vitalidade da Fortuna', type: 'heal', cost: 2, value: 6, desc: 'Cura com energia abundante.' }
+            { id: 1, name: 'Investida Dourada', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Ataque rápido que brilha como ouro.' },
+            { id: 2, name: 'Barreira de Moedas', type: 'defend', cost: 2, value: 6, rarity: 'Comum', desc: 'Escudo forjado em riquezas.' },
+            { id: 3, name: 'Tesouro Arcano', type: 'mana', cost: 0, value: 4, rarity: 'Incomum', desc: 'Restaura mana com poder monetário.' },
+            { id: 4, name: 'Golpe Valioso', type: 'attack', cost: 3, value: 10, rarity: 'Rara', desc: 'Ataque forte com preço alto.' },
+            { id: 5, name: 'Vitalidade da Fortuna', type: 'heal', cost: 2, value: 6, rarity: 'Incomum', desc: 'Cura com energia abundante.' }
         ];
     }
 }
@@ -182,9 +205,9 @@ export class DefaultEnemy extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Investida Sombria', type: 'attack', cost: 1, value: 6, desc: 'Ataque básico do inimigo.' },
-            { id: 2, name: 'Escudo Sutil', type: 'defend', cost: 0, value: 4, desc: 'Aumenta um pouco de armadura.' },
-            { id: 3, name: 'Fúria do Inimigo', type: 'attack', cost: 2, value: 9, desc: 'Ataque mais forte do adversário.' }
+            { id: 1, name: 'Investida Sombria', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Ataque básico do inimigo.' },
+            { id: 2, name: 'Escudo Sutil', type: 'defend', cost: 0, value: 4, rarity: 'Comum', desc: 'Aumenta um pouco de armadura.' },
+            { id: 3, name: 'Fúria do Inimigo', type: 'attack', cost: 2, value: 9, rarity: 'Incomum', desc: 'Ataque mais forte do adversário.' }
         ];
     }
 }

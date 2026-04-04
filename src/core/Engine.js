@@ -1,13 +1,14 @@
 import { Player } from '../entities/Player.js'; //Importa a lógica do herói [cite: 6]
 import { InputHandler } from './InputHandler.js'; //Importa o leitor de teclado
 import { SelectionScene } from '../scenes/SelectionScene.js'; //Importa a tela de escolha [cite: 93, 96]
+import { CombatScene } from '../scenes/CombatScene.js'; //Importa a nova cena de combate
 import { CardSystem } from '../mechanics/CardSystem.js'; //Importa o sistema das cartas
-import { ManaManager } from '../mechanics/ManaManager.js'; //Importa o gerenciamento da mana
-import { createBattleCharacter, DefaultEnemy } from '../mechanics/DeckCharacters.js'; //Importa os decks de cada personagem
+import { createBattleCharacter } from '../mechanics/DeckCharacters.js'; //Importa os decks de cada personagem
+import { createWorldEnemies, createBattleEnemy } from '../mechanics/Enemies.js'; //Importa inimigos do jogo
+import { Physics } from '../utils/Physics.js'; //Importa o sistema de física
 
 export class Engine {
     constructor(canvasId) {
-        this.manaManager = new ManaManager(18); //Define a quantidade de mana inicial
         this.cardSystem = null; // Referência ao sistema de cartas ativo durante batalha
         this.battlePlayer = null; // Personagem do jogador usado na batalha de cartas
         this.battleEnemy = null; // Inimigo atual do duelo
@@ -23,11 +24,41 @@ export class Engine {
         this.canvas.height = 720; //Altura do campo de visão
         this.lastTime = 0; //Marca o tempo do frame anterior
 
+        // Inicializa o sistema de física
+        this.physics = new Physics(0.5);
+        this.setupPlatforms();
+
+        this.combatScene = new CombatScene(this); // Instancia cena de combate
+        this.worldEnemies = createWorldEnemies(); // Gerencia inimigos no cenário externo
+        this.pendingCombatEnemy = null;
+        this.combatEnter = { active: false, progress: 0, duration: 600 }; // Transição de batalha
+
         this.initEventListeners(); //Ativa a escuta de cliques
     }
 
+    // Configura as plataformas flutuantes
+    setupPlatforms() {
+        // Plataforma principal no chão
+        this.physics.addPlatform(0, 600, 1280, 120);
+
+        // Plataformas flutuantes
+        this.physics.addPlatform(300, 500, 200, 20);  // Plataforma média
+        this.physics.addPlatform(600, 400, 150, 20);  // Plataforma alta
+        this.physics.addPlatform(900, 350, 180, 20);  // Plataforma mais alta
+        this.physics.addPlatform(200, 300, 120, 20);  // Plataforma esquerda alta
+        this.physics.addPlatform(1000, 250, 160, 20); // Plataforma direita muito alta
+        this.physics.addPlatform(450, 200, 140, 20);  // Plataforma central alta
+    }
+
     initEventListeners() {
-        // Clique do mouse no canvas: usado apenas para selecionar personagem na tela inicial
+        // Movimento do mouse: rastreia posição para hover
+        this.canvas.addEventListener('mousemove', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouseX = e.clientX - rect.left;
+            this.mouseY = e.clientY - rect.top;
+        });
+
+        // Clique do mouse no canvas: usado para selecionar personagem ou clicar em cartas
         this.canvas.addEventListener('mousedown', (e) => {
             const rect = this.canvas.getBoundingClientRect(); //Pega a posição do canvas na tela
             const mouseX = e.clientX - rect.left; //Calcula X real dentro do jogo
@@ -35,31 +66,83 @@ export class Engine {
 
             if (this.gameState === 'SELECTION') {
                 this.selectionScene.handleInput(mouseX, mouseY); //Envia o clique para a cena [cite: 96]
+            } else if (this.gameState === 'BATTLE') {
+                this.handleCardClick(mouseX, mouseY); //Processa clique nas cartas durante batalha
             }
         });
 
         // Teclas pressionadas: dispara ações de batalha ou inicia batalha em exploração
         window.addEventListener('keydown', (e) => {
-            if (this.gameState === 'EXPLORATION' && e.code === 'KeyB') {
-                this.startBattle(); // No mundo, B inicia um duelo
-            }
-
             if (this.gameState === 'BATTLE') {
                 this.handleBattleInput(e); // Durante a batalha, processa comandos de cartas
             }
         });
     }
 
+    handleCardClick(mouseX, mouseY) {
+        // Dimensões das cartas conforme definidas em CombatScene.draw()
+        const cardWidth = 220;
+        const cardHeight = 180;
+        const gap = 20;
+        const startX = 40;
+        const startY = 500;
+
+        // Verifica se o clique está dentro da área das cartas (entre startY e startY + cardHeight)
+        if (mouseY < startY || mouseY > startY + cardHeight) {
+            return; // Clique fora da área das cartas
+        }
+
+        // Calcula qual carta foi clicada
+        if (this.cardSystem && this.cardSystem.hand) {
+            for (let index = 0; index < this.cardSystem.hand.length; index++) {
+                const cardX = startX + index * (cardWidth + gap);
+                const cardEndX = cardX + cardWidth;
+
+                // Verifica se o clique está dentro dos limites da carta
+                if (mouseX >= cardX && mouseX <= cardEndX) {
+                    // Encontrou a carta clicada, tenta jogá-la
+                    const result = this.cardSystem.playCard(index);
+                    if (!result.success) {
+                        this.cardSystem.addMessage(result.message); // Mensagem de erro
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
     update(deltaTime) {
         // Atualiza a lógica do jogo dependendo do estado atual
         if (this.gameState === 'SELECTION') {
-            this.selectionScene.update(); //Atualiza lógica da seleção [cite: 93]
+            this.selectionScene.update(deltaTime); //Atualiza lógica da seleção [cite: 93]
         } else if (this.gameState === 'EXPLORATION') {
             if (!this.player) {
-                this.player = new Player(this.selectedCharacter.color); //Cria o herói com sua cor
+                this.player = new Player(this.selectedCharacter.color, this.physics); //Cria o herói com sua cor e física
                 this.input = new InputHandler(this.player);//Ativa os comandos
             }
             this.player.update(); //Processa gravidade e movimento [cite: 10, 22]
+
+            // Atualiza inimigos e busca colisões com o player
+            for (const enemy of this.worldEnemies) {
+                if (!enemy.active) continue;
+                enemy.update(this.player, this.physics);
+
+                if (this.physics.checkCollision(this.player, enemy) && !this.combatEnter.active) {
+                    this.pendingCombatEnemy = enemy;
+                    this.combatEnter.active = true;
+                    this.combatEnter.progress = 0;
+                }
+            }
+
+            if (this.combatEnter.active) {
+                this.combatEnter.progress += deltaTime;
+                if (this.combatEnter.progress >= this.combatEnter.duration) {
+                    this.combatEnter.active = false;
+                    this.startBattle();
+                }
+            }
+        } else if (this.gameState === 'BATTLE') {
+            this.combatScene.update(deltaTime);
         }
     }
 
@@ -72,11 +155,13 @@ export class Engine {
 
         // Cria as entidades de combate com o deck correto para o personagem escolhido
         this.battlePlayer = createBattleCharacter(this.selectedCharacter.name, this.selectedCharacter.color);
-        this.battleEnemy = new DefaultEnemy();
-        this.cardSystem = new CardSystem(this.battlePlayer, this.battleEnemy, this.manaManager);
+
+        const template = this.pendingCombatEnemy ? this.pendingCombatEnemy.template : null;
+        this.battleEnemy = createBattleEnemy(template);
+        this.cardSystem = new CardSystem(this.battlePlayer, this.battleEnemy, this.battlePlayer.manaManager);
 
         this.gameState = 'BATTLE'; // Entra no estado de batalha
-        this.cardSystem.resetCombat(); // Prepara decks, mão e mana para o duelo
+        this.combatScene.start(this.cardSystem); // Inicia cena de batalha com animação e baralhos
     }
 
     handleBattleInput(e) {
@@ -107,29 +192,49 @@ export class Engine {
             this.scheduleReturnToExploration();
         }
 
-        // Reiniciar duelo se pressionar B após o fim da batalha
-        if (e.code === 'KeyB' && this.cardSystem.isBattleOver()) {
-            this.startBattle();
-        }
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); //Limpa o rastro anterior
 
         if (this.gameState === 'SELECTION') {
-            this.selectionScene.draw(this.ctx); //Desenha os personagens e títulos [cite: 93]
+            this.selectionScene.draw(this.ctx);
         } else if (this.gameState === 'EXPLORATION') {
-            this.drawExploration(); //Desenha o mundo e status [cite: 3, 14]
+            this.drawExploration();
+
+            // Transição de combate: zoom dramático + dark overlay
+            if (this.combatEnter.active) {
+                const p = Math.min(this.combatEnter.progress / this.combatEnter.duration, 1);
+                const alpha = 0.3 + 0.5 * p;
+                this.ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                const zoom = 1 + 0.2 * p;
+                this.ctx.save();
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.scale(zoom, zoom);
+                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+                this.drawExploration(); // redesenha com zoom
+                this.ctx.restore();
+            }
         } else if (this.gameState === 'BATTLE') {
-            this.drawBattle(); // Renderiza a interface de batalha de cartas
+            this.combatScene.draw(this.ctx);
         }
     }
 
     drawExploration() {
         this.ctx.fillStyle = '#FFFFFF'; //Fundo do Silêncio Branco [cite: 2]
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); //Pinta o fundo [cite: 3]
-        this.ctx.fillStyle = '#444444'; //Cor da plataforma de pedra [cite: 3]
-        this.ctx.fillRect(0, 600, this.canvas.width, 120); //Desenha o chão [cite: 10]
+
+        // Desenha as plataformas
+        this.physics.drawPlatforms(this.ctx);
+
+        // Desenha inimigos de exploração
+        for (const enemy of this.worldEnemies) {
+            if (enemy.active) {
+                enemy.draw(this.ctx);
+            }
+        }
 
         if (this.player) this.player.draw(this.ctx); //Desenha o herói atual [cite: 6]
 
@@ -138,7 +243,14 @@ export class Engine {
         this.ctx.font = 'bold 20px Arial'; //Fonte do status
         this.ctx.fillText(`Herói: ${this.selectedCharacter.name}`, 20, 40); //Nome do herói [cite: 6]
         this.ctx.fillText(`Setor: Caminho de Vidro e Ossos`, 20, 70); //Localização [cite: 12]
-        this.ctx.fillText('Pressione B para começar um duelo de cartas.', 20, 110);
+
+        if (this.combatEnter.active) {
+            this.ctx.fillStyle = 'rgba(255, 0, 0, 0.65)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.font = 'bold 24px Arial';
+            this.ctx.fillText('Iniciando batalha!', this.canvas.width / 2 - 250, 180);
+        }
     }
 
     scheduleReturnToExploration() {
@@ -147,85 +259,13 @@ export class Engine {
             clearTimeout(this.battleEndTimeout);
         }
         this.battleEndTimeout = setTimeout(() => {
+            if (this.cardSystem && this.cardSystem.winner === 'player' && this.pendingCombatEnemy) {
+                this.pendingCombatEnemy.active = false; // Inimigo foi derrotado
+            }
+            this.pendingCombatEnemy = null;
             this.gameState = 'EXPLORATION'; // Volta ao mundo de exploração
             this.battleEndTimeout = null;
         }, 1200);
-    }
-
-    drawBattle() {
-        const cs = this.cardSystem; // Atalho para acesso rápido aos dados da batalha
-
-        // Fundo da tela de batalha
-        this.ctx.fillStyle = '#11111A';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Painel de status do jogador (vida, escudo, mana)
-        this.ctx.fillStyle = '#222';
-        this.ctx.fillRect(40, 40, 600, 140);
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = '22px Arial';
-        this.ctx.fillText(`Vida Jogador: ${cs.playerHealth}/${cs.playerMaxHealth}`, 60, 75);
-        this.ctx.fillText(`Escudo: ${cs.playerArmor}`, 60, 105);
-        this.ctx.fillText(`Mana: ${cs.mana}/${cs.maxMana}`, 60, 135);
-
-        // Exibe o status do inimigo no mesmo painel
-        this.ctx.fillText(`Vida Inimigo: ${cs.enemyHealth}/${cs.enemyMaxHealth}`, 400, 75);
-        this.ctx.fillText(`Escudo: ${cs.enemyArmor}`, 400, 105);
-
-        // Área da mão do jogador
-        this.ctx.fillStyle = '#333';
-        this.ctx.fillRect(40, 220, 1200, 260);
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText('Sua mão de cartas', 60, 255);
-
-        const cardWidth = 220;
-        const cardHeight = 180;
-        const gap = 20;
-        cs.hand.forEach((card, index) => {
-            // Posiciona cada carta horizontalmente com espaçamento e sua cor por raridade
-            const x = 60 + index * (cardWidth + gap);
-            const y = 280;
-            const rarityColor = cs.getCardRarityColor(card);
-            const rarityLabel = cs.getCardRarity(card);
-            this.ctx.fillStyle = '#2A2A3F';
-            this.ctx.fillRect(x, y, cardWidth, cardHeight);
-            this.ctx.strokeStyle = rarityColor;
-            this.ctx.lineWidth = 3;
-            this.ctx.strokeRect(x, y, cardWidth, cardHeight);
-            this.ctx.lineWidth = 1;
-            this.ctx.fillStyle = '#FFFFFF';
-            this.ctx.font = '18px Arial';
-            this.ctx.fillText(`${index + 1}. ${card.name}`, x + 10, y + 30);
-            this.ctx.font = '16px Arial';
-            this.ctx.fillText(`Custo: ${card.cost}`, x + 10, y + 60);
-            this.ctx.fillText(card.desc, x + 10, y + 90, cardWidth - 20);
-            this.ctx.fillStyle = rarityColor;
-            this.ctx.fillText(`Raridade: ${rarityLabel}`, x + 10, y + 160);
-        });
-
-        // Painel inferior com deck, descarte e comandos de teclado
-        this.ctx.fillStyle = '#222';
-        this.ctx.fillRect(40, 520, 1200, 140);
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = '18px Arial';
-        this.ctx.fillText(`Deck: ${cs.deck.length} cartas | Descarte: ${cs.discardPile.length} cartas`, 60, 555);
-        this.ctx.fillText('Teclas: 1-5 = jogar carta | R = comprar até 5 cartas | E = terminar turno | B = reiniciar', 60, 585);
-
-        // Mensagens de combate exibidas no canto inferior
-        this.ctx.fillStyle = '#0F0';
-        this.ctx.font = '16px Arial';
-        cs.messages.forEach((message, index) => {
-            this.ctx.fillText(message, 60, 620 + index * 22);
-        });
-
-        // Exibe o resultado final se o duelo acabou
-        if (cs.isBattleOver()) {
-            this.ctx.fillStyle = '#FFD700';
-            this.ctx.font = '28px Arial';
-            const status = cs.winner === 'player' ? 'Você venceu!' : 'Você perdeu...';
-            this.ctx.fillText(status, 60, 700);
-        }
     }
 
     async init() { this.start(); } //Inicia o loop

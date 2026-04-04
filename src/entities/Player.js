@@ -1,5 +1,5 @@
 export class Player {
-    constructor(color) {
+    constructor(color, physics) {
         this.x = 100; //Posição horizontal inicial no Vazio [cite: 3]
         this.y = 500; //Posição vertical inicial acima da plataforma
         this.width = 50; //Largura do retângulo (espaço para sua sprite futura)
@@ -9,21 +9,28 @@ export class Player {
         this.velocityX = 0; //Velocidade lateral atual
         this.velocityY = 0; //Velocidade vertical (gravidade/pulo)
         this.speed = 5; //Velocidade de caminhada pelo cenário
-        this.gravity = 0.5; //Força que puxa o herói para baixo constantemente
         this.jumpForce = -12; //Força do impulso para desafiar a gravidade [cite: 10]
         this.isGrounded = false; //Verifica se o herói está tocando o chão de pedra [cite: 5]
+
+        this.physics = physics; // Sistema de física
     }
 
     update() {
-        this.velocityY += this.gravity; //Aplica a aceleração da gravidade [cite: 21]
-        this.y += this.velocityY; //Atualiza a posição vertical com base na velocidade
-        this.x += this.velocityX; //Atualiza a posição horizontal com base no input
+        // Aplica física usando o sistema Physics.js
+        if (this.physics) {
+            this.physics.applyPhysics(this);
+        } else {
+            // Fallback para física básica se não houver sistema de física
+            this.velocityY += 0.5; // Gravidade básica
+            this.y += this.velocityY;
+            this.x += this.velocityX;
 
-        // Lógica de colisão com o chão (Plataforma de Pedra de Marah) [cite: 3]
-        if (this.y + this.height > 600) {
-            this.y = 600 - this.height; //Mantém o herói exatamente sobre o chão
-            this.velocityY = 0; //Zera a velocidade de queda ao tocar a pedra
-            this.isGrounded = true; //Permite que o herói pule novamente [cite: 22]
+            // Colisão básica com o chão
+            if (this.y + this.height > 600) {
+                this.y = 600 - this.height;
+                this.velocityY = 0;
+                this.isGrounded = true;
+            }
         }
     }
 

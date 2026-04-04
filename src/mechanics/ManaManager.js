@@ -1,6 +1,18 @@
 export class ManaManager {
-    constructor(maxMana = 18) {
-        this.maxMana = maxMana; // mana máxima do jogador
+    static characterMana = {
+        'Íris Shadowlace': 24,
+        'Atom Shadowlace': 12,
+        'Ioruh': 12,
+        'Toshy': 18,
+        'Mogli': 18,
+        'Thanatá': 24,
+        'Inimigo': 20,
+        'default': 20
+    };
+
+    constructor(name, maxMana) {
+        this.name = name;
+        this.maxMana = maxMana || ManaManager.characterMana[name] || ManaManager.characterMana['default']; // mana máxima do jogador
         this.currentMana = 0; // mana atual disponível
         this.reset(); // inicia com mana cheia
     }

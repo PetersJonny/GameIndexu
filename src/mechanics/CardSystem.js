@@ -98,12 +98,21 @@ export class CardSystem { // Gerencia a lógica de combate com cartas entre joga
 
         // Executa efeito da carta de acordo com seu tipo
         if (card.type === 'attack') {
-            const damage = this.enemy.takeDamage(card.value);
+            const attackBonus = this.player.weaponBonus || 0;
+            const damage = this.enemy.takeDamage(card.value + attackBonus);
             this.addMessage(`${card.name} causa ${damage} de dano.`);
+            if (attackBonus > 0) {
+                this.addMessage(`Bônus de arma: +${attackBonus} de ataque.`);
+            }
         }
         if (card.type === 'defend') {
-            this.player.addArmor(card.value);
-            this.addMessage(`${card.name} concede ${card.value} de escudo.`);
+            const defenseBonus = this.player.defenseBonus || 0;
+            const totalDefense = card.value + defenseBonus;
+            this.player.addArmor(totalDefense);
+            this.addMessage(`${card.name} concede ${totalDefense} de escudo.`);
+            if (defenseBonus > 0) {
+                this.addMessage(`Bônus de armadura: +${defenseBonus} de defesa.`);
+            }
         }
         if (card.type === 'heal') {
             this.player.heal(card.value);
@@ -176,11 +185,19 @@ export class CardSystem { // Gerencia a lógica de combate com cartas entre joga
         this.isPlayerTurn = true;
 
         if (this.manaManager) {
-            const min = 2; // Minimo de mana que volta no turno
-            const max = 5; // Máximo de mana que volta no turno
-            const valorAleatorio = Math.floor(Math.random() * (max - min + 1)) + min; // Cria a aleatoriedade
-
-            this.manaManager.restore(valorAleatorio); // Restaura o valor
+            if (this.player.alwaysMaxMana) {
+                this.manaManager.refill();
+                this.addMessage('Relíquia ativa: mana restaurada ao máximo.');
+            } else {
+                const min = 2; // Minimo de mana que volta no turno
+                const max = 5; // Máximo de mana que volta no turno
+                const valorAleatorio = Math.floor(Math.random() * (max - min + 1)) + min; // Cria a aleatoriedade
+                this.manaManager.restore(valorAleatorio); // Restaura o valor
+                if (this.player.manaRegen) {
+                    this.manaManager.restore(this.player.manaRegen);
+                    this.addMessage(`Relíquia ativa: +${this.player.manaRegen} mana adicional.`);
+                }
+            }
         }
 
     }

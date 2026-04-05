@@ -2,10 +2,12 @@ import { Player } from '../entities/Player.js'; //Importa a lógica do herói [c
 import { InputHandler } from './InputHandler.js'; //Importa o leitor de teclado
 import { SelectionScene } from '../scenes/SelectionScene.js'; //Importa a tela de escolha [cite: 93, 96]
 import { CombatScene } from '../scenes/CombatScene.js'; //Importa a nova cena de combate
+import { InventoryScene } from '../scenes/InventoryScene.js'; //Importa a janela de inventário
 import { CardSystem } from '../mechanics/CardSystem.js'; //Importa o sistema das cartas
 import { createBattleCharacter } from '../mechanics/DeckCharacters.js'; //Importa os decks de cada personagem
 import { createWorldEnemies, createBattleEnemy } from '../mechanics/Enemies.js'; //Importa inimigos do jogo
 import { Physics } from '../utils/Physics.js'; //Importa o sistema de física
+import { InitialScene } from '../scenes/InitialScene.js';
 
 export class Engine {
     constructor(canvasId) {
@@ -14,12 +16,25 @@ export class Engine {
         this.battleEnemy = null; // Inimigo atual do duelo
         this.canvas = document.getElementById(canvasId); //Busca o canvas no HTML
         this.ctx = this.canvas.getContext('2d'); //Ativa o modo de desenho 2D
+        this.initialScene = new InitialScene(this); //Instancia a cena inicial [cite: 93]
         this.selectionScene = new SelectionScene(this); //Instancia a cena de seleção [cite: 93]
+        this.inventoryScene = new InventoryScene(this); // Instancia a janela de inventário
         this.player = null; //O herói começa vazio até a escolha [cite: 6]
         this.input = null; //O teclado liga após a seleção
         this.selectedCharacter = null; //Armazena o herói escolhido [cite: 96]
         this.battleEndTimeout = null; // Timeout usado para voltar à exploração após o fim da batalha
-        this.gameState = 'SELECTION'; //Começa na tela de seleção [cite: 93]
+        this.gameState = 'INITIAL'; //Começa na tela de seleção [cite: 93]
+        this.memoryFragments = 0; // Fragmentos de Memória acumulados
+        this.inventory = [
+            { id: 1, name: 'Varinha Flamejante', type: 'weapon', desc: '+2 em cartas attack', bonus: { attack: 2 } },
+            { id: 2, name: 'Peitoral de Éter', type: 'armor', desc: '+5 HP máximo e +1 em defesa', bonus: { maxHealth: 5, defense: 1 } },
+            { id: 3, name: 'Anel do Fluxo', type: 'relic', desc: '+2 Mana máxima por turno', bonus: { maxMana: 2, manaRegen: 5 } },
+            { id: 4, name: 'Poção de Vida', type: 'consumable', desc: 'Recupera 10 de vida ao usar.' },
+            null, null, null, null,
+            null, null, null, null,
+            null, null, null, null
+        ];
+        this.equipment = { weapon: null, armor: null, relic: null };
         this.canvas.width = 1280; //Largura do campo de visão
         this.canvas.height = 720; //Altura do campo de visão
         this.lastTime = 0; //Marca o tempo do frame anterior
@@ -64,15 +79,29 @@ export class Engine {
             const mouseX = e.clientX - rect.left; //Calcula X real dentro do jogo
             const mouseY = e.clientY - rect.top; //Calcula Y real dentro do jogo
 
-            if (this.gameState === 'SELECTION') {
+            if (this.gameState === 'INITIAL') {
+                this.initialScene.handleInput(mouseX, mouseY); //Envia o clique para a cena inicial
+            } else if (this.gameState === 'SELECTION') {
                 this.selectionScene.handleInput(mouseX, mouseY); //Envia o clique para a cena [cite: 96]
             } else if (this.gameState === 'BATTLE') {
                 this.handleCardClick(mouseX, mouseY); //Processa clique nas cartas durante batalha
+            } else if (this.gameState === 'INVENTORY') {
+                this.inventoryScene.handleInput(mouseX, mouseY);
             }
         });
 
-        // Teclas pressionadas: dispara ações de batalha ou inicia batalha em exploração
+        // Teclas pressionadas: dispara ações de batalha, abre inventário ou inicia batalha em exploração
         window.addEventListener('keydown', (e) => {
+            if (this.gameState === 'EXPLORATION' && e.code === 'KeyI') {
+                this.openInventory();
+                return;
+            }
+
+            if (this.gameState === 'INVENTORY' && e.code === 'Escape') {
+                this.closeInventory();
+                return;
+            }
+
             if (this.gameState === 'BATTLE') {
                 this.handleBattleInput(e); // Durante a batalha, processa comandos de cartas
             }
@@ -113,12 +142,14 @@ export class Engine {
 
     update(deltaTime) {
         // Atualiza a lógica do jogo dependendo do estado atual
-        if (this.gameState === 'SELECTION') {
+         if (this.gameState === 'INITIAL') {
+            this.initialScene.update(deltaTime);
+        } else if (this.gameState === 'SELECTION') {
             this.selectionScene.update(deltaTime); //Atualiza lógica da seleção [cite: 93]
         } else if (this.gameState === 'EXPLORATION') {
             if (!this.player) {
                 this.player = new Player(this.selectedCharacter.color, this.physics); //Cria o herói com sua cor e física
-                this.input = new InputHandler(this.player);//Ativa os comandos
+                this.input = new InputHandler(this, this.player);//Ativa os comandos
             }
             this.player.update(); //Processa gravidade e movimento [cite: 10, 22]
 
@@ -143,6 +174,8 @@ export class Engine {
             }
         } else if (this.gameState === 'BATTLE') {
             this.combatScene.update(deltaTime);
+        } else if (this.gameState === 'INVENTORY') {
+            // inventário permanece estático enquanto aberto
         }
     }
 
@@ -158,10 +191,41 @@ export class Engine {
 
         const template = this.pendingCombatEnemy ? this.pendingCombatEnemy.template : null;
         this.battleEnemy = createBattleEnemy(template);
+        this.applyEquipmentToBattlePlayer(this.battlePlayer);
         this.cardSystem = new CardSystem(this.battlePlayer, this.battleEnemy, this.battlePlayer.manaManager);
 
         this.gameState = 'BATTLE'; // Entra no estado de batalha
         this.combatScene.start(this.cardSystem); // Inicia cena de batalha com animação e baralhos
+        this.combatScene.onBattleEnd = this.handleBattleEnd.bind(this);
+    }
+
+    handleBattleEnd(result) {
+        if (result.winner === 'player') {
+            this.memoryFragments += typeof result.reward === 'number' ? result.reward : 0;
+            this.scheduleReturnToExploration();
+        } else if (result.winner === 'enemy') {
+            this.resetAfterDefeat();
+        }
+    }
+
+    openInventory() {
+        this.gameState = 'INVENTORY';
+    }
+
+    closeInventory() {
+        this.gameState = 'EXPLORATION';
+    }
+
+    applyEquipmentToBattlePlayer(player) {
+        const equip = this.equipment;
+        if (!player) return;
+
+        player.weaponBonus = equip.weapon?.bonus?.attack || 0;
+        player.defenseBonus = equip.armor?.bonus?.defense || 0;
+        player.maxHealth += equip.armor?.bonus?.maxHealth || 0;
+        player.manaManager.maxMana += equip.relic?.bonus?.maxMana || 0;
+        player.alwaysMaxMana = Boolean(equip.relic?.bonus?.alwaysMaxMana);
+        player.manaRegen = equip.relic?.bonus?.manaRegen || 0;
     }
 
     handleBattleInput(e) {
@@ -185,16 +249,25 @@ export class Engine {
         if (e.code === 'KeyE') {
             this.cardSystem.endTurn();
         }
-
-        // Se o duelo terminou, agenda retorno para exploração
-        if (this.cardSystem.isBattleOver()) {
-            this.cardSystem.addMessage('Duelo terminado.');
-            this.scheduleReturnToExploration();
-        }
-
     }
 
     draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); //Limpa o rastro anterior
+        
+        if (this.gameState === 'INITIAL') {
+            this.initialScene.draw(this.ctx);
+        } else if (this.gameState === 'SELECTION') {
+            this.drawSelection();
+        } else if (this.gameState === 'EXPLORATION') {
+            this.drawExploration();
+        } else if (this.gameState === 'BATTLE') {
+            this.combatScene.draw(this.ctx);
+        } else if (this.gameState === 'INVENTORY') {
+            this.inventoryScene.draw(this.ctx);
+        }
+    }
+
+    drawSelection() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); //Limpa o rastro anterior
 
         if (this.gameState === 'SELECTION') {
@@ -210,15 +283,24 @@ export class Engine {
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
                 const zoom = 1 + 0.2 * p;
+                const focusX = this.player && this.pendingCombatEnemy
+                    ? (this.player.x + this.pendingCombatEnemy.x) / 2
+                    : this.canvas.width / 2;
+                const focusY = this.player && this.pendingCombatEnemy
+                    ? (this.player.y + this.pendingCombatEnemy.y) / 2
+                    : this.canvas.height / 2;
+
                 this.ctx.save();
                 this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
                 this.ctx.scale(zoom, zoom);
-                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
-                this.drawExploration(); // redesenha com zoom
+                this.ctx.translate(-focusX, -focusY);
+                this.drawExploration(); // redesenha com zoom focado
                 this.ctx.restore();
             }
         } else if (this.gameState === 'BATTLE') {
             this.combatScene.draw(this.ctx);
+        } else if (this.gameState === 'INVENTORY') {
+            this.inventoryScene.draw(this.ctx);
         }
     }
 
@@ -243,6 +325,9 @@ export class Engine {
         this.ctx.font = 'bold 20px Arial'; //Fonte do status
         this.ctx.fillText(`Herói: ${this.selectedCharacter.name}`, 20, 40); //Nome do herói [cite: 6]
         this.ctx.fillText(`Setor: Caminho de Vidro e Ossos`, 20, 70); //Localização [cite: 12]
+        this.ctx.fillText(`Fragmentos: ${this.memoryFragments}`, 20, 100);
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText('Pressione I para abrir o inventário.', 20, 130);
 
         if (this.combatEnter.active) {
             this.ctx.fillStyle = 'rgba(255, 0, 0, 0.65)';
@@ -266,6 +351,24 @@ export class Engine {
             this.gameState = 'EXPLORATION'; // Volta ao mundo de exploração
             this.battleEndTimeout = null;
         }, 1200);
+    }
+
+    resetAfterDefeat() {
+        if (this.player) {
+            this.player.x = 100;
+            this.player.y = 500;
+            this.player.velocityX = 0;
+            this.player.velocityY = 0;
+        }
+
+        if (this.cardSystem) {
+            this.cardSystem.resetCombat();
+        }
+
+        if (this.combatScene) {
+            this.combatScene.start(this.cardSystem);
+            this.combatScene.onBattleEnd = this.handleBattleEnd.bind(this);
+        }
     }
 
     async init() { this.start(); } //Inicia o loop

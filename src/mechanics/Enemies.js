@@ -5,6 +5,8 @@ import { ManaManager } from './ManaManager.js';
 export const ENEMY_DEFINITIONS = {
     'Goblin Vigarista': {
         name: 'Goblin Vigarista',
+        rank: 'minor',
+        rewardRange: [3, 3],
         color: '#8B0000',
         maxHealth: 30,
         maxMana: 16,
@@ -21,6 +23,8 @@ export const ENEMY_DEFINITIONS = {
     },
     'Orc Guardião': {
         name: 'Orc Guardião',
+        rank: 'major',
+        rewardRange: [4, 8],
         color: '#556B2F',
         maxHealth: 45,
         maxMana: 10,
@@ -48,6 +52,8 @@ export function createBattleEnemy(definition) {
 
     const enemy = new DeckCharacter(definition.name, definition.color, definition.maxHealth || 35);
     enemy.manaManager = new ManaManager(definition.name, definition.maxMana || 12);
+    enemy.rank = definition.rank || 'minor';
+    enemy.rewardRange = definition.rewardRange || [3, 3];
     enemy.createDeck = function () {
         // Copia das cartas para evitar mutação global
         return definition.cards.map(c => ({ ...c }));

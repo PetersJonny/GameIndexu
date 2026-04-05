@@ -2,28 +2,36 @@ export class SelectionScene {
     constructor(engine) {
         this.engine = engine;//Referência ao motor
         this.characters = [
-            { name: 'Íris Shadowlace', class: 'Feiticeira Demônia/Anjo', color: '#FF4500' }, //Fogo [cite: 80]
+            { name: 'Íris Shadowlace', class: 'Feiticeira Demônia/Anjo', color: '#FF4500', portrait: './public/assets/sprites/cartas_select/CartaIris.png' }, //Fogo [cite: 80]
             { name: 'Atom Shadowlace', class: 'Golem de Pedra', color: '#708090' }, //Metal [cite: 81]
             { name: 'Ioruh', class: 'Druida Coruja', color: '#8B4513' }, //Madeira [cite: 82]
             { name: 'Toshy', class: 'Necromante Osteon', color: '#00BFFF' }, //Fogo Azul [cite: 83]
             { name: 'Mogli', class: 'Arqueiro Trog', color: '#228B22' }, //Folha [cite: 84]
             { name: 'Thanatá', class: 'Maga Humana', color: '#FFD700' } //Moeda [cite: 85]
         ];
-        this.rectWidth = 150; //Largura do card
-        this.rectHeight = 250; //Altura do card
+        this.rectWidth = 180; //Largura do card de seleção
+        this.rectHeight = 320; //Altura do card de seleção
+        this.startX = 50; //Margem esquerda de 50px para o conjunto de cards
         this.startY = 200; //Posição Y inicial
-        this.spacing = 40; //Espaço entre cards
+        this.spacing = 20; //Espaço entre cards
+        this.portraitWidth = 128; //Largura do sprite de portrait
+        this.portraitHeight = 192; //Altura do sprite de portrait
         this.hoveredIndex = -1; //Índice do card em hover
         this.animationTime = 0; //Tempo para animações
         this.confirming = false; //Estado de confirmação
         this.confirmTime = 0; //Tempo da animação de confirmação
+
+        this.irisPortrait = new Image();
+        this.irisPortraitLoaded = false;
+        this.irisPortrait.src = './public/assets/sprites/cartas_select/CartaIris.png';
+        this.irisPortrait.onload = () => { this.irisPortraitLoaded = true; };
     }
 
     updateHover() {
         this.hoveredIndex = -1;
         if (this.engine.mouseX !== undefined && this.engine.mouseY !== undefined) {
             this.characters.forEach((char, index) => {
-                const x = 100 + index * (this.rectWidth + this.spacing);
+                const x = this.startX + index * (this.rectWidth + this.spacing);
                 if (this.engine.mouseX >= x && this.engine.mouseX <= x + this.rectWidth &&
                     this.engine.mouseY >= this.startY && this.engine.mouseY <= this.startY + this.rectHeight) {
                     this.hoveredIndex = index;
@@ -54,7 +62,7 @@ export class SelectionScene {
         ctx.fillText('Escolha seu Destino no Vazio', this.engine.canvas.width / 2, 100); //Título [cite: 9]
 
         this.characters.forEach((char, index) => {
-            const x = 100 + index * (this.rectWidth + this.spacing); //Posição X do card
+            const x = this.startX + index * (this.rectWidth + this.spacing); //Posição X do card
             const isHovered = this.hoveredIndex === index;
             const scale = isHovered ? 1.05 : 1; //Leve aumento no hover
             const scaledWidth = this.rectWidth * scale;
@@ -68,8 +76,18 @@ export class SelectionScene {
                 ctx.shadowBlur = 20;
             }
 
-            ctx.fillStyle = char.color; //Cor do herói
-            ctx.fillRect(x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight); //Desenha card
+            if (char.name === 'Íris Shadowlace') {
+                // Desenha o retrato de Iris no mesmo tamanho do card, sem o fundo laranja
+                if (this.irisPortraitLoaded) {
+                    ctx.drawImage(this.irisPortrait, x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight);
+                } else {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight);
+                }
+            } else {
+                ctx.fillStyle = char.color; //Cor do herói
+                ctx.fillRect(x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight); //Desenha card
+            }
 
             ctx.shadowColor = 'transparent'; //Reseta sombra
 
@@ -84,9 +102,9 @@ export class SelectionScene {
             ctx.fillStyle = '#000'; //Cor do nome
             ctx.font = '16px Arial'; //Fonte do nome
             ctx.textAlign = 'center';
-            ctx.fillText(char.name, x + this.rectWidth / 2, this.startY + this.rectHeight + 30); //Nome
+            ctx.fillText(char.name, x + this.rectWidth / 2, this.startY + this.rectHeight + 40); //Nome
             ctx.font = '12px Arial';
-            ctx.fillText(char.class, x + this.rectWidth / 2, this.startY + this.rectHeight + 50); //Classe
+            ctx.fillText(char.class, x + this.rectWidth / 2, this.startY + this.rectHeight + 60); //Classe
         });
 
         // Animação de confirmação
@@ -99,7 +117,7 @@ export class SelectionScene {
 
     handleInput(mouseX, mouseY) {
         this.characters.forEach((char, index) => {
-            const x = 100 + index * (this.rectWidth + this.spacing); //Posição X para checar
+            const x = this.startX + index * (this.rectWidth + this.spacing); //Posição X para checar
             if (mouseX >= x && mouseX <= x + this.rectWidth &&
                 mouseY >= this.startY && mouseY <= this.startY + this.rectHeight) {
                 this.selectCharacter(char); //Seleciona se clicar dentro [cite: 96]

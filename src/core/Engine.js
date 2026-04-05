@@ -24,7 +24,6 @@ export class Engine {
         this.selectedCharacter = null; //Armazena o herói escolhido [cite: 96]
         this.battleEndTimeout = null; // Timeout usado para voltar à exploração após o fim da batalha
         this.gameState = 'INITIAL'; //Começa na tela de seleção [cite: 93]
-<<<<<<< HEAD
         this.memoryFragments = 0; // Fragmentos de Memória acumulados
         this.inventory = [
             { id: 1, name: 'Varinha Flamejante', type: 'weapon', desc: '+2 em cartas attack', bonus: { attack: 2 } },
@@ -36,8 +35,6 @@ export class Engine {
             null, null, null, null
         ];
         this.equipment = { weapon: null, armor: null, relic: null };
-=======
->>>>>>> ec5c60e112759220079228f969e46d0ba245f16e
         this.canvas.width = 1280; //Largura do campo de visão
         this.canvas.height = 720; //Altura do campo de visão
         this.lastTime = 0; //Marca o tempo do frame anterior
@@ -145,11 +142,7 @@ export class Engine {
 
     update(deltaTime) {
         // Atualiza a lógica do jogo dependendo do estado atual
-<<<<<<< HEAD
          if (this.gameState === 'INITIAL') {
-=======
-        if (this.gameState === 'INITIAL') {
->>>>>>> ec5c60e112759220079228f969e46d0ba245f16e
             this.initialScene.update(deltaTime);
         } else if (this.gameState === 'SELECTION') {
             this.selectionScene.update(deltaTime); //Atualiza lógica da seleção [cite: 93]

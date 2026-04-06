@@ -90,6 +90,8 @@ export class Engine {
             }
         });
 
+        const keysToBlock = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space']; // Teclas cujo comportamento padrão deve ser prevenido
+
         // Teclas pressionadas: dispara ações de batalha, abre inventário ou inicia batalha em exploração
         window.addEventListener('keydown', (e) => {
 

@@ -77,6 +77,17 @@ export class Engine {
 
         // Teclas pressionadas: dispara ações de batalha ou inicia batalha em exploração
         window.addEventListener('keydown', (e) => {
+
+            // Bloqueia o scroll do navegador para WASD, Setas e Espaço
+            const keysToBlock = [
+                "Space", "KeyW", "KeyA", "KeyS", "KeyD", 
+                "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"
+            ];
+
+            if (keysToBlock.includes(e.code)) {
+                e.preventDefault(); // Impede a tela de "pular" ou mexer
+            }
+
             if (this.gameState === 'BATTLE') {
                 this.handleBattleInput(e); // Durante a batalha, processa comandos de cartas
             }

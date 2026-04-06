@@ -2,10 +2,13 @@ body {
   margin: 0; /* Remove margens brancas da pagina */
   overflow: hidden; /* Impede barras de rolagem */
   background-color: #111; /* Fundo escuro atras do jogo */
+  display: flex; /* Centraliza o canvas na tela */
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center; /* Centraliza verticalmente */
+  min-height: 100vh; /* Garante que o corpo ocupe toda a altura da janela */
 }
 
 canvas {
   display: block; /* Remove espaços vazios embaixo do canvas */
-  margin: 0 auto; /* Centraliza o jogo na tela */
   background-color: #fff; /* O Silencio Branco de Marah */
 }

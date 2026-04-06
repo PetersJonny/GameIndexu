@@ -113,7 +113,14 @@ export class ÍrisShadowlace extends DeckCharacter {
             { id: 2, name: 'Sombra Curativa', type: 'heal', cost: 2, value: 7, rarity: 'Incomum', desc: 'Recupera parte da sua vida.' },
             { id: 3, name: 'Escudo Etéreo', type: 'defend', cost: 1, value: 5, rarity: 'Comum', desc: 'Ganha proteção mágica.' },
             { id: 4, name: 'Chama Crescente', type: 'attack', cost: 3, value: 11, rarity: 'Rara', desc: 'Dano maior para desafiar inimigos.' },
-            { id: 5, name: 'Fluxo Arcano', type: 'mana', cost: 0, value: 3, rarity: 'Incomum', desc: 'Restaura mana rapidamente.' }
+            { id: 5, name: 'Fluxo Arcano', type: 'mana', cost: 0, value: 2, rarity: 'Comum', desc: 'Restaura mana rapidamente.' },
+            { id: 6, name: 'Sopro de Inverno', type: 'attack', cost: 1, value: 4, rarity: 'Comum', desc: 'Um sopro congelante.' },
+            { id: 7, name: 'Barreira de Espinhos', type: 'defend', cost: 2, value: 8, rarity: 'Incomum', desc: 'Cria uma proteção com espinhos.' },
+            { id: 8, name: 'Golpe de Vidro', type: 'attack', cost: 1, value: 8, rarity: 'Comum', desc: 'Ataque com cacos de vidro.' },
+            { id: 9, name: 'Meditação Veloz', type: 'mana', cost: 0, value: 2, rarity: 'Comum', desc: 'Restaura mana com leve meditação.' },
+            { id: 10, name: 'Impacto Sísmico', type: 'attack', cost: 2, value: 9, rarity: 'Incomum', desc: 'Ataque com grande impacto.' },
+            { id: 11, name: 'Prece de Sangue', type: 'heal', cost: 3, value: 12, rarity: 'Rara', desc: 'Recupera vida com sangue.' },
+            { id: 12, name: 'Vingança Radiante', type: 'attack', cost: 4, value: 16, rarity: 'Rara', desc: 'Ataque carregado com vingança.' }
         ];
     }
 }
@@ -126,10 +133,17 @@ export class AtomShadowlace extends DeckCharacter {
     createDeck() {
         return [
             { id: 1, name: 'Impacto Metálico', type: 'attack', cost: 1, value: 5, rarity: 'Comum', desc: 'Ataque concentrado de metal.' },
-            { id: 2, name: 'Barreira de Aço', type: 'defend', cost: 2, value: 7, rarity: 'Comum', desc: 'Aumenta a defesa instantaneamente.' },
+            { id: 2, name: 'Barreira de Aço', type: 'defend', cost: 2, value: 7, rarity: 'Incomum', desc: 'Aumenta a defesa instantaneamente.' },
             { id: 3, name: 'Reator Energético', type: 'mana', cost: 0, value: 4, rarity: 'Incomum', desc: 'Restaura mais mana.' },
             { id: 4, name: 'Estilhaço', type: 'attack', cost: 4, value: 8, rarity: 'Rara', desc: 'Causa dano extra enquanto perfura.' },
-            { id: 5, name: 'Escudo Magnético', type: 'defend', cost: 1, value: 4, rarity: 'Incomum', desc: 'Proteção que reduz dano.' }
+            { id: 5, name: 'Escudo Magnético', type: 'defend', cost: 1, value: 4, rarity: 'Comum', desc: 'Proteção que reduz dano.' },
+            { id: 6, name: 'Pulso Eletromagnético', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Ataque de ondas eletromagnéticas.' },
+            { id: 7, name: 'Blindagem Reforçada', type: 'defend', cost: 3, value: 10, rarity: 'Rara', desc: 'Aumenta defesa com alta blindagem' },
+            { id: 8, name: 'Sobrecarga', type: 'attack', cost: 4, value: 15, rarity: 'Rara', desc: 'Ataque com uma alta carga.' },
+            { id: 9, name: 'Célula de Energia', type: 'mana', cost: 0, value: 2, rarity: 'Comum', desc: 'Restaura mana rapidamente.' },
+            { id: 10, name: 'Disparo de Plasma', type: 'attack', cost: 2, value: 9, rarity: 'Incomum', desc: 'Ataque concentrado de plasma.' },
+            { id: 11, name: 'Reparo de Emergência', type: 'heal', cost: 2, value: 6, rarity: 'Comum', desc: 'Recupera vida com reparo.' },
+            { id: 12, name: 'Lâmina de Titânio', type: 'attack', cost: 3, value: 12, rarity: 'Incomum', desc: 'Ataque com lâmina afiada.' }
         ];
     }
 }
@@ -141,12 +155,19 @@ export class Ioruh extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Rugido da Floresta', type: 'attack', cost: 4, value: 8, rarity: 'Rara', desc: 'Ajuda a ferir o inimigo com força bruta.' },
-            { id: 2, name: 'Proteção Natural', type: 'defend', cost: 1, value: 6, rarity: 'Comum', desc: 'Ganha armadura da floresta.' },
-            { id: 3, name: 'Sangue Vital', type: 'heal', cost: 2, value: 6, rarity: 'Comum', desc: 'Recupera energia vital do ambiente.' },
-            { id: 4, name: 'Golpe Selvagem', type: 'attack', cost: 3, value: 6, rarity: 'Comum', desc: 'Golpe forte que pode superar escudos.' },
-            { id: 5, name: 'Espírito da Madeira', type: 'mana', cost: 0, value: 2, rarity: 'Incomum', desc: 'Restaura um pouco de mana.' }
-        ];
+            { id: 1, name: 'Rugido da Floresta', type: 'attack', cost: 2, value: 10, rarity: 'Incomum', desc: 'Ataque com um rugido.' },
+            { id: 2, name: 'Proteção Natural', type: 'defend', cost: 1, value: 5, rarity: 'Comum', desc: 'Ganha armadura da floresta.' },
+            { id: 3, name: 'Sangue Vital', type: 'heal', cost: 2, value: 7, rarity: 'Comum', desc: 'Recupera energia vital do ambiente.' },
+            { id: 4, name: 'Golpe Selvagem', type: 'attack', cost: 3, value: 13, rarity: 'Incomum', desc: 'Ataque da natureza.' },
+            { id: 5, name: 'Espírito da Madeira', type: 'mana', cost: 0, value: 3, rarity: 'Comum', desc: 'Restaura um pouco de mana.' },
+            { id: 6, name: 'Engenharia de Selva', type: 'defend', cost: 2, value: 9, rarity: 'Incomum', desc: 'Ergue uma defesa sólida.' },
+            { id: 7, name: 'Garra Mecânica', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Um ataque rápido com próteses de combate.' },
+            { id: 8, name: 'Soro Botânico', type: 'heal', cost: 3, value: 10, rarity: 'Incomum', desc: 'Uma mistura de ervas que regenera feridas.' },
+            { id: 9, name: 'Sintonia Animal', type: 'mana', cost: 0, value: 1, rarity: 'Comum', desc: 'Conecção com a natureza para focar.' },
+            { id: 10, name: 'Dispositivo de Espinhos', type: 'attack', cost: 2, value: 8, rarity: 'Incomum', desc: 'Lança projéteis orgânicos.' },
+            { id: 11, name: 'Armadura de Raízes', type: 'defend', cost: 3, value: 12, rarity: 'Rara', desc: 'Invoca a resistência das árvore para proteção.' },
+            { id: 12, name: 'Sobrecarga Primal', type: 'attack', cost: 4, value: 16, rarity: 'Rara', desc: 'Libera uma explosão de energia selvagem.' }
+                    ];
     }
 }
 //deck e status do Toshy
@@ -159,9 +180,16 @@ export class Toshy extends DeckCharacter {
         return [
             { id: 1, name: 'Lança de Gelo', type: 'attack', cost: 1, value: 5, rarity: 'Comum', desc: 'Ataque rápido e preciso.' },
             { id: 2, name: 'Placa Densa', type: 'defend', cost: 2, value: 6, rarity: 'Comum', desc: 'Cria uma defesa firme.' },
-            { id: 3, name: 'Corrente Azul', type: 'mana', cost: 0, value: 3, rarity: 'Incomum', desc: 'Restaura energia mágica.' },
-            { id: 4, name: 'Descarga Fria', type: 'attack', cost: 3, value: 10, rarity: 'Rara', desc: 'Ataque poderoso que congela o inimigo.' },
-            { id: 5, name: 'Recarga', type: 'heal', cost: 2, value: 5, rarity: 'Incomum', desc: 'Regenera parte da saúde.' }
+            { id: 3, name: 'Corrente Azul', type: 'mana', cost: 0, value: 3, rarity: 'Comum', desc: 'Restaura energia mágica.' },
+            { id: 4, name: 'Descarga Fria', type: 'attack', cost: 3, value: 10, rarity: 'Incomum', desc: 'Ataque poderoso que congela o inimigo.' },
+            { id: 5, name: 'Recarga', type: 'heal', cost: 2, value: 5, rarity: 'Comum', desc: 'Regenera parte da saúde.' },
+            { id: 6, name: 'Toque de Ossos', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Um toque gélido que causa dano.' },
+            { id: 7, name: 'Muralha de Marfim', type: 'defend', cost: 3, value: 9, rarity: 'Incomum', desc: 'Barreira maciça feita de restos mortais.' },
+            { id: 8, name: 'Foice Espectral', type: 'attack', cost: 2, value: 8, rarity: 'Incomum', desc: 'Uma lâmina que atravessa a matéria física.' },
+            { id: 9, name: 'Essência Gélida', type: 'mana', cost: 0, value: 2, rarity: 'Comum', desc: 'Recupera um pouco de mana.' },
+            { id: 10, name: 'Armadura Óssea', type: 'defend', cost: 1, value: 4, rarity: 'Comum', desc: 'Proteção leve com placas de ossos.' },
+            { id: 11, name: 'Dreno Vital', type: 'heal', cost: 3, value: 8, rarity: 'Incomum', desc: 'Suga a vitalidade do inimigo para se recuperar.' },
+            { id: 12, name: 'Explosão de Cadáver', type: 'attack', cost: 4, value: 14, rarity: 'Rara', desc: 'Detona energia necrótica.' }
         ];
     }
 }
@@ -176,8 +204,15 @@ export class Mogli extends DeckCharacter {
             { id: 1, name: 'Flechada', type: 'attack', cost: 1, value: 7, rarity: 'Comum', desc: 'Atira uma flecha no inimigo.' },
             { id: 2, name: 'Mordida', type: 'attack', cost: 2, value: 4, rarity: 'Comum', desc: 'Morde o inimigo com ferocidade.' },
             { id: 3, name: 'Pulo Ágil', type: 'defend', cost: 1, value: 5, rarity: 'Comum', desc: 'Desvia e ganha escudo rápido.' },
-            { id: 4, name: 'Alma da Folha', type: 'mana', cost: 0, value: 3, rarity: 'Incomum', desc: 'Recupera mana com a força da floresta.' },
-            { id: 5, name: 'Encontrar erva', type: 'heal', cost: 3, value: 6, rarity: 'Rara', desc: 'Procura ervas para se curar.' }
+            { id: 4, name: 'Alma da Folha', type: 'mana', cost: 0, value: 3, rarity: 'Comum', desc: 'Recupera mana com a força da floresta.' },
+            { id: 5, name: 'Encontrar erva', type: 'heal', cost: 3, value: 6, rarity: 'Comum', desc: 'Procura ervas para se curar.' },
+            { id: 6, name: 'Disparo Triplo', type: 'attack', cost: 3, value: 12, rarity: 'Rara', desc: 'Dispara três projéteis simultâneos.' },
+            { id: 7, name: 'Camuflagem', type: 'defend', cost: 2, value: 8, rarity: 'Incomum', desc: 'Oculta-se na vegetação para se defender.' },
+            { id: 8, name: 'Flecha Envenenada', type: 'attack', cost: 2, value: 9, rarity: 'Incomum', desc: 'Uma flecha banhada em toxinas letais.' },
+            { id: 9, name: 'Orvalho da Floresta', type: 'mana', cost: 0, value: 2, rarity: 'Comum', desc: 'Recupera um pouco de mana.' },
+            { id: 10, name: 'Pele de Escamas', type: 'defend', cost: 3, value: 11, rarity: 'Rara', desc: 'Endurece a pele com camadas de escamas.' },
+            { id: 11, name: 'Bagas Silvestres', type: 'heal', cost: 2, value: 4, rarity: 'Comum', desc: 'Frutos nutritivos que recuperam energias.' },
+            { id: 12, name: 'Chuva de Flechas', type: 'attack', cost: 4, value: 16, rarity: 'Rara', desc: 'Cobre o campo de batalha com fechas.' }
         ];
     }
 }
@@ -189,11 +224,18 @@ export class Thanatá extends DeckCharacter {
 
     createDeck() {
         return [
-            { id: 1, name: 'Investida Dourada', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Ataque rápido que brilha como ouro.' },
-            { id: 2, name: 'Barreira de Moedas', type: 'defend', cost: 2, value: 6, rarity: 'Comum', desc: 'Escudo forjado em riquezas.' },
-            { id: 3, name: 'Tesouro Arcano', type: 'mana', cost: 0, value: 4, rarity: 'Incomum', desc: 'Restaura mana com poder monetário.' },
-            { id: 4, name: 'Golpe Valioso', type: 'attack', cost: 3, value: 10, rarity: 'Rara', desc: 'Ataque forte com preço alto.' },
-            { id: 5, name: 'Vitalidade da Fortuna', type: 'heal', cost: 2, value: 6, rarity: 'Incomum', desc: 'Cura com energia abundante.' }
+            { id: 1, name: 'Investida de Raios', type: 'attack', cost: 1, value: 6, rarity: 'Comum', desc: 'Ataque rápido com raios.' },
+            { id: 2, name: 'Campo elétrico', type: 'defend', cost: 2, value: 6, rarity: 'Comum', desc: 'Escudo forjado em eletricidade.' },
+            { id: 3, name: 'Sobrecarga de Elétrons', type: 'mana', cost: 0, value: 4, rarity: 'Incomum', desc: 'Restaura mana.' },
+            { id: 4, name: 'Tempestade de raios', type: 'attack', cost: 3, value: 10, rarity: 'Incomum', desc: 'Ataque com múltiplos raios.' },
+            { id: 5, name: 'Restauração Eletrolítica', type: 'heal', cost: 2, value: 6, rarity: 'Incomum', desc: 'Cura com energia abundante.' },
+            { id: 6, name: 'Centelha Estática', type: 'attack', cost: 1, value: 7, rarity: 'Comum', desc: 'Uma pequena descarga elétrica.' },
+            { id: 7, name: 'Manto de Plasma', type: 'defend', cost: 3, value: 10, rarity: 'Rara', desc: 'Uma camada de energia superaquecida.' },
+            { id: 8, name: 'Chicotada Voltaica', type: 'attack', cost: 2, value: 9, rarity: 'Incomum', desc: 'Um feixe de eletricidade que chicoteia.' },
+            { id: 9, name: 'Núcleo Magnético', type: 'mana', cost: 0, value: 2, rarity: 'Comum', desc: 'Estabiliza o campo magnético e recarrega as energias.' },
+            { id: 10, name: 'Barreira Ionizada', type: 'defend', cost: 1, value: 4, rarity: 'Comum', desc: 'Cria uma proteção rápida.' },
+            { id: 11, name: 'Reanimação Cardíaca', type: 'heal', cost: 3, value: 9, rarity: 'Incomum', desc: 'Um choque controlado para recuperação.' },
+            { id: 12, name: 'Trovão do Juízo', type: 'attack', cost: 4, value: 15, rarity: 'Rara', desc: 'Convoca um raio devastador.' }
         ];
     }
 }

@@ -92,6 +92,9 @@ export class Engine {
 
         // Teclas pressionadas: dispara ações de batalha, abre inventário ou inicia batalha em exploração
         window.addEventListener('keydown', (e) => {
+
+            if (keysToBlock.includes(e.code)) {
+                e.preventDefault(); // Impede a tela de "pular" ou mexer
             if (this.gameState === 'EXPLORATION' && e.code === 'KeyI') {
                 this.openInventory();
                 return;

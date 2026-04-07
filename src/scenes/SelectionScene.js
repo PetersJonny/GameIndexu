@@ -2,13 +2,21 @@ export class SelectionScene {
     constructor(engine) {
         this.engine = engine;//Referência ao motor
         this.characters = [
-            { name: 'Íris Shadowlace', class: 'Feiticeira Demônia/Anjo', color: '#FF4500', portrait: './public/assets/sprites/cartas_select/CartaIris.png' }, //Fogo [cite: 80]
-            { name: 'Atom Shadowlace', class: 'Golem de Pedra', color: '#708090' }, //Metal [cite: 81]
-            { name: 'Ioruh', class: 'Druida Coruja', color: '#8B4513' }, //Madeira [cite: 82]
-            { name: 'Toshy', class: 'Necromante Osteon', color: '#00BFFF' }, //Fogo Azul [cite: 83]
-            { name: 'Mogli', class: 'Arqueiro Trog', color: '#228B22' }, //Folha [cite: 84]
-            { name: 'Thanatá', class: 'Maga Humana', color: '#FFD700' } //Moeda [cite: 85]
+            { name: 'Íris Shadowlace', class: 'Feiticeira Demônia/Anjo', color: '#FF4500', portrait: 'assets/sprites/cartas_select/CartaIris.png' }, //Fogo [cite: 80]
+            { name: 'Atom Shadowlace', class: 'Golem de Pedra', color: '#708090', portrait: 'assets/sprites/cartas_select/CartaAtom.png' }, //Metal [cite: 81]
+            { name: 'Ioruh', class: 'Druida Coruja', color: '#8B4513', portrait: 'assets/sprites/cartas_select/CartaIoruh.png' }, //Madeira [cite: 82]
+            { name: 'Toshy', class: 'Necromante Osteon', color: '#00BFFF', portrait: 'assets/sprites/cartas_select/CartaToshy.png' }, //Fogo Azul [cite: 83]
+            { name: 'Mogli', class: 'Arqueiro Trog', color: '#228B22', portrait: 'assets/sprites/cartas_select/CartaMogli.png' }, //Folha [cite: 84]
+            { name: 'Thanatá', class: 'Maga Humana', color: '#FFD700', portrait: 'assets/sprites/cartas_select/CartaThanata.png' } //Moeda [cite: 85]
         ];
+
+        this.characters.forEach((char) => {
+            char.image = new Image();
+            char.image.loaded = false;
+            char.image.src = char.portrait;
+            char.image.onload = () => { char.image.loaded = true; };
+        });
+
         this.rectWidth = 180; //Largura do card de seleção
         this.rectHeight = 320; //Altura do card de seleção
         this.startX = 50; //Margem esquerda de 50px para o conjunto de cards
@@ -21,10 +29,6 @@ export class SelectionScene {
         this.confirming = false; //Estado de confirmação
         this.confirmTime = 0; //Tempo da animação de confirmação
 
-        this.irisPortrait = new Image();
-        this.irisPortraitLoaded = false;
-        this.irisPortrait.src = './public/assets/sprites/cartas_select/CartaIris.png';
-        this.irisPortrait.onload = () => { this.irisPortraitLoaded = true; };
     }
 
     updateHover() {
@@ -76,14 +80,8 @@ export class SelectionScene {
                 ctx.shadowBlur = 20;
             }
 
-            if (char.name === 'Íris Shadowlace') {
-                // Desenha o retrato de Iris no mesmo tamanho do card, sem o fundo laranja
-                if (this.irisPortraitLoaded) {
-                    ctx.drawImage(this.irisPortrait, x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight);
-                } else {
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight);
-                }
+            if (char.image && char.image.loaded) {
+                ctx.drawImage(char.image, x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight);
             } else {
                 ctx.fillStyle = char.color; //Cor do herói
                 ctx.fillRect(x + offsetX, this.startY + offsetY, scaledWidth, scaledHeight); //Desenha card

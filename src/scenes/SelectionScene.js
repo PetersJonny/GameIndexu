@@ -89,12 +89,7 @@ export class SelectionScene {
 
             ctx.shadowColor = 'transparent'; //Reseta sombra
 
-            // Animação simples do personagem (pulsar)
-            if (isHovered) {
-                const pulse = Math.sin(this.animationTime * 0.01) * 0.1 + 1;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.fillRect(x + offsetX + 10, this.startY + offsetY + 10, (scaledWidth - 20) * pulse, scaledHeight - 20);
-            }
+            
 
             // Descrição dinâmica
             ctx.fillStyle = '#000'; //Cor do nome

@@ -1,14 +1,19 @@
 body {
-  margin: 0; /* Remove margens brancas da pagina */
-  overflow: hidden; /* Impede barras de rolagem */
-  background-color: #111; /* Fundo escuro atras do jogo */
-  display: flex; /* Centraliza o canvas na tela */
-  justify-content: center; /* Centraliza horizontalmente */
-  align-items: center; /* Centraliza verticalmente */
-  min-height: 100vh; /* Garante que o corpo ocupe toda a altura da janela */
+  margin: 0; /* Remove margens brancas padrão do navegador */
+  padding: 0; /* Garante que não haja espaçamento interno no corpo */
+  overflow: hidden; /* Impede o aparecimento de barras de rolagem */
+  background-color: #000; /* Fundo preto puro para fundir com o "Vazio" */
+  display: flex; /* Ativa o modo de layout flexível */
+  justify-content: center; /* Centraliza o jogo horizontalmente */
+  align-items: center; /* Centraliza o jogo verticalmente */
+  width: 100vw; /* Força o corpo a ocupar toda a largura da janela */
+  height: 100vh; /* Força o corpo a ocupar toda a altura da janela */
 }
 
 canvas {
-  display: block; /* Remove espaços vazios embaixo do canvas */
-  background-color: #fff; /* O Silencio Branco de Marah */
+  display: block; /* Remove o respiro/espaço vazio abaixo do canvas */
+  width: 100%; /* Faz o canvas ocupar toda a largura disponível */
+  height: 100%; /* Faz o canvas ocupar toda a altura disponível */
+  object-fit: fill; /* Estica o jogo para preencher a tela sem deixar bordas */
+  background-color: #fff; /* O Silêncio Branco de Marah (fundo interno) */
 }

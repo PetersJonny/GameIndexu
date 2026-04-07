@@ -49,6 +49,25 @@ export class Engine {
         this.combatEnter = { active: false, progress: 0, duration: 600 }; // Transição de batalha
 
         this.initEventListeners(); //Ativa a escuta de cliques
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+
+    // Redimensiona o tamanho da tela
+    resize() {
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Força o estilo do elemento a ocupar 100% da janela disponível
+        this.canvas.style.width = windowWidth + 'px';
+        this.canvas.style.height = windowHeight + 'px';
+
+        // Remove qualquer posicionamento que possa estar centralizando e criando vácuos
+        this.canvas.style.position = 'fixed';
+        this.canvas.style.left = '0';
+        this.canvas.style.top = '0';
+        this.canvas.style.transform = 'none';
+        this.canvas.style.margin = '0';
     }
 
     // Configura as plataformas flutuantes
@@ -66,29 +85,40 @@ export class Engine {
     }
 
     initEventListeners() {
-        // Movimento do mouse: rastreia posição para hover
-        this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouseX = e.clientX - rect.left;
-            this.mouseY = e.clientY - rect.top;
-        });
+    // Função auxiliar para converter coordenadas
+    const getMousePos = (e) => {
+        const rect = this.canvas.getBoundingClientRect();
+        // Calcula a escala real do canvas em relação ao que é exibido
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    };
 
-        // Clique do mouse no canvas: usado para selecionar personagem ou clicar em cartas
-        this.canvas.addEventListener('mousedown', (e) => {
-            const rect = this.canvas.getBoundingClientRect(); //Pega a posição do canvas na tela
-            const mouseX = e.clientX - rect.left; //Calcula X real dentro do jogo
-            const mouseY = e.clientY - rect.top; //Calcula Y real dentro do jogo
+    this.canvas.addEventListener('mousemove', (e) => {
+        const pos = getMousePos(e);
+        this.mouseX = pos.x;
+        this.mouseY = pos.y;
+    });
 
-            if (this.gameState === 'INITIAL') {
-                this.initialScene.handleInput(mouseX, mouseY); //Envia o clique para a cena inicial
-            } else if (this.gameState === 'SELECTION') {
-                this.selectionScene.handleInput(mouseX, mouseY); //Envia o clique para a cena [cite: 96]
-            } else if (this.gameState === 'BATTLE') {
-                this.handleCardClick(mouseX, mouseY); //Processa clique nas cartas durante batalha
-            } else if (this.gameState === 'INVENTORY') {
-                this.inventoryScene.handleInput(mouseX, mouseY);
-            }
-        });
+    this.canvas.addEventListener('mousedown', (e) => {
+        const pos = getMousePos(e);
+        const mouseX = pos.x;
+        const mouseY = pos.y;
+
+        if (this.gameState === 'INITIAL') {
+            this.initialScene.handleInput(mouseX, mouseY);
+        } else if (this.gameState === 'SELECTION') {
+            this.selectionScene.handleInput(mouseX, mouseY);
+        } else if (this.gameState === 'BATTLE') {
+            this.handleCardClick(mouseX, mouseY);
+        } else if (this.gameState === 'INVENTORY') {
+            this.inventoryScene.handleInput(mouseX, mouseY);
+        }
+    });
 
         const keysToBlock = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space']; // Teclas cujo comportamento padrão deve ser prevenido
 

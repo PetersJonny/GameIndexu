@@ -8,19 +8,21 @@ export class InventoryScene {
 
         this.portraitBox = { x: this.x + 30, y: this.y + 90, width: 220, height: 260 };
         this.grid = {
-            cols: 4,
+            cols: 5,
             rows: 4,
             slotSize: 64,
             gap: 24,
-            x: this.x + 280,
+            x: this.x + (this.width - (4 * 64 + 3 * 24)) / 2,
             y: this.y + 90
         };
 
         const equipmentY = this.grid.y + this.grid.rows * (this.grid.slotSize + this.grid.gap) + 26;
+        const equipmentWidth = 3 * 160 + 2 * 20;
+        const equipmentStartX = this.x + (this.width - equipmentWidth) / 2;
         this.equipmentSlots = [
-            { key: 'weapon', label: 'Arma', x: this.grid.x, y: equipmentY, width: 160, height: 160 },
-            { key: 'armor', label: 'Armadura', x: this.grid.x + 180, y: equipmentY, width: 160, height: 160 },
-            { key: 'relic', label: 'Relíquia', x: this.grid.x + 360, y: equipmentY, width: 160, height: 160 }
+            { key: 'weapon', label: 'Arma', x: equipmentStartX, y: equipmentY, width: 160, height: 160 },
+            { key: 'armor', label: 'Armadura', x: equipmentStartX + 180, y: equipmentY, width: 160, height: 160 },
+            { key: 'relic', label: 'Relíquia', x: equipmentStartX + 360, y: equipmentY, width: 160, height: 160 }
         ];
 
         this.portraitImage = null;

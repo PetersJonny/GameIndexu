@@ -40,6 +40,12 @@ export class Engine {
         this.canvas.height = 720; //Altura do campo de visão
         this.lastTime = 0; //Marca o tempo do frame anterior
 
+        // Imagem de fundo fixa da exploração
+        this.bgExploration = new Image();
+        this.bgExploration.loaded = false;
+        this.bgExploration.src = './assets/backgrounds/fundo_montanhas.png';
+        this.bgExploration.onload = () => { this.bgExploration.loaded = true; };
+
         // Inicializa o sistema de física
         this.physics = new Physics(0.5);
         this.setupPlatforms();
@@ -297,35 +303,42 @@ export class Engine {
     }
 
     drawExploration() {
-
-        // 1. CÂMERA DO MUNDO (COM ZOOM)
-        this.ctx.save();
-
-        // AJUSTE DE DISTÂNCIA:
-        // Diminua isso (ex: 1.5, 1.6 ou 1.8) se quiser afastar a câmera da personagem.
+        // PREPARAÇÃO DA CÂMERA (Precisamos saber onde ela tá para mover o fundo)
         let zoom = 1.6;
-
         let focusX = this.canvas.width / 2;
         let focusY = this.canvas.height / 2;
 
         if (this.player) {
-            // AJUSTE DE POSIÇÃO NA TELA:
-            // Colocar "+ 150" faz a câmera olhar mais para frente etc,
-            // deixando a personagem mais "para trás" no canto da tela.
-            focusX = this.player.x + 70;
-
-            // Se quiser que ela fique mais embaixo na tela, mudar o -40 para -80 ou -100.
+            focusX = this.player.x + 70; // O seu ajuste perfeito!
             focusY = this.player.y - 40;
         }
 
-        // Aplica o movimento e o zoom da câmera
+
+        // 1. DESENHA O FUNDO COM EFEITO PARALLAX (Movimento Suave)
+        if (this.bgExploration && this.bgExploration.loaded) {
+            // Define o quão rápido o fundo move. 0.2 = 20% da velocidade do chão.
+            let parallaxSpeed = 0.2;
+
+            // Calcula o deslocamento e faz o wrap (repetição infinita)
+            let parallaxX = -(focusX * parallaxSpeed) % this.canvas.width;
+            if (parallaxX > 0) parallaxX -= this.canvas.width; // Garante que a colagem não quebre andando pra trás
+
+            // Desenha a imagem duas vezes lado a lado para não ficar um "buraco" preto
+            this.ctx.drawImage(this.bgExploration, parallaxX, 0, this.canvas.width, this.canvas.height);
+            this.ctx.drawImage(this.bgExploration, parallaxX + this.canvas.width, 0, this.canvas.width, this.canvas.height);
+        } else {
+            // Um azul céu provisório se a imagem não carregar
+            this.ctx.fillStyle = '#87CEEB';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+
+        // 2. CÂMERA DO MUNDO E PLATAFORMAS
+        this.ctx.save();
+
+        // Aplica o movimento e o zoom da câmera no chão e no jogador
         this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
         this.ctx.scale(zoom, zoom);
         this.ctx.translate(-focusX, -focusY);
-
-        // Desenha o Fundo (Preenchimento gigante para cobrir o zoom)
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.fillRect(focusX - 2000, focusY - 2000, 4000, 4000);
 
         // Desenha as plataformas e Inimigos
         this.physics.drawPlatforms(this.ctx);
@@ -336,10 +349,13 @@ export class Engine {
         // Desenha o herói
         if (this.player) this.player.draw(this.ctx);
 
-        this.ctx.restore(); // DESLIGA A CÂMERA AQUI (O Combate e a Interface estão a salvo)
+        this.ctx.restore(); // DESLIGA A CÂMERA AQUI
 
-        // 2. INTERFACE (HUD - Fica parada na tela sem zoom)
-        this.ctx.fillStyle = 'black';
+        // 3. INTERFACE (HUD)
+        this.ctx.fillStyle = 'white';
+        this.ctx.shadowColor = 'black';
+        this.ctx.shadowBlur = 4;
+
         this.ctx.textAlign = 'left';
         this.ctx.font = 'bold 20px Arial';
         this.ctx.fillText(`Herói: ${this.selectedCharacter.name}`, 20, 40);
@@ -348,7 +364,9 @@ export class Engine {
         this.ctx.font = '16px Arial';
         this.ctx.fillText('Pressione I para abrir o inventário.', 20, 130);
 
-        // 3. TRANSIÇÃO PARA A BATALHA (Apenas escurece a tela)
+        this.ctx.shadowColor = 'transparent'; // Desliga a sombra
+
+        // 4. TRANSIÇÃO PARA A BATALHA
         if (this.combatEnter.active) {
             const p = Math.min(this.combatEnter.progress / this.combatEnter.duration, 1);
 
@@ -356,7 +374,7 @@ export class Engine {
             this.ctx.fillStyle = `rgba(0, 0, 0, ${0.8 * p})`;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-            // Texto de alerta (Protegido por save/restore para não vazar a formatação)
+            // Texto de alerta
             this.ctx.save();
             this.ctx.fillStyle = `rgba(255, 255, 255, ${p})`;
             this.ctx.textAlign = 'center';

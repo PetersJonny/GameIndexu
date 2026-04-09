@@ -2,6 +2,17 @@ export class Physics {
     constructor(gravity = 0.5) {
         this.gravity = gravity; // Força da gravidade
         this.platforms = []; // Array de plataformas
+
+        // CARREGAMENTO DAS TEXTURAS DA FLORESTA
+        // 1. Textura do Chão Principal
+        this.groundImage = new Image();
+        this.groundImage.src = './assets/sprites/texture/chao_floresta.png';
+        this.groundPattern = null; // Vai guardar o carimbo de repetição
+
+        // 2. Textura das Plataformas Flutuantes
+        this.platformImage = new Image();
+        this.platformImage.src = './assets/sprites/texture/plataforma_floresta.png';
+        this.platformPattern = null;
     }
 
     // Adiciona uma plataforma ao sistema de física
@@ -100,17 +111,43 @@ export class Physics {
         }
     }
 
-    // Método para desenhar plataformas (útil para debug)
+    // Método para desenhar plataformas com texturas
     drawPlatforms(ctx) {
-        ctx.fillStyle = '#8B4513'; // Cor marrom para plataformas
-        for (const platform of this.platforms) {
-            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-
-            // Borda para melhor visualização
-            ctx.strokeStyle = '#654321';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+        // Gera os padrões de repetição se as imagens já tiverem carregado
+        if (this.groundImage.complete && this.groundImage.width > 0 && !this.groundPattern) {
+            this.groundPattern = ctx.createPattern(this.groundImage, 'repeat');
         }
-        ctx.lineWidth = 1; // Restaura largura da linha
+        if (this.platformImage.complete && this.platformImage.width > 0 && !this.platformPattern) {
+            this.platformPattern = ctx.createPattern(this.platformImage, 'repeat');
+        }
+
+        for (const platform of this.platforms) {
+            ctx.save(); // Salva a posição original da tela
+
+            // Move o "pincel" para a quina exata da plataforma.
+            // Isso garante que a grama da textura fique sempre no topo!
+            ctx.translate(platform.x, platform.y);
+
+            // Se a plataforma for alta (120px de altura), é o chão principal
+            const isGround = platform.height >= 100;
+
+            if (isGround && this.groundPattern) {
+                ctx.fillStyle = this.groundPattern;
+            } else if (!isGround && this.platformPattern) {
+                ctx.fillStyle = this.platformPattern;
+            } else {
+                ctx.fillStyle = '#8B4513'; // Cor provisória caso a imagem demore a carregar
+            }
+
+            // Desenha o retângulo (agora a partir do 0,0 porque usamos o translate)
+            ctx.fillRect(0, 0, platform.width, platform.height);
+
+            // Borda opcional mais escura para dar um acabamento nas pontas
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, platform.width, platform.height);
+
+            ctx.restore(); // Devolve o pincel para o lugar normal
+        }
     }
 }

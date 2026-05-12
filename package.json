@@ -1,0 +1,27 @@
+{
+  "name": "gameindexu",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/PetersJonny/GameIndexu#readme",
+  "bugs": {
+    "url": "https://github.com/PetersJonny/GameIndexu/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PetersJonny/GameIndexu.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  }
+}

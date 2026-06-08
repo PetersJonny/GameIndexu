@@ -1,13 +1,17 @@
+// Controla o fluxo de combate, gerando inimigos, criando o estado de batalha e processando ataques.
+
 const TURN_STATES = {
   PLAYER: "playerTurn",
   ENEMY: "enemyTurn",
 };
 
+// Bônus randômicos ao ataque de cada turno.
 const TURN_ATTACK_BONUSES = {
   player: { min: 0, max: 2 },
   enemy: { min: 0, max: 1 },
 };
 
+// Inimigos comuns da fase 1.
 const ENEMIES_COMBAT = [
   { name: "Slime", hp: 8, attack: 2, defense: 0 },
   { name: "Goblin", hp: 12, attack: 4, defense: 2 },
@@ -15,6 +19,7 @@ const ENEMIES_COMBAT = [
   { name: "Wraith", hp: 16, attack: 5, defense: 1 },
 ];
 
+// Inimigos comuns da fase 2.
 const ENEMIES_COMBAT_FASE2 = [
   { name: "Flame Bat", hp: 14, attack: 6, defense: 2 },
   { name: "Spectral Knight", hp: 18, attack: 6, defense: 3 },
@@ -22,6 +27,7 @@ const ENEMIES_COMBAT_FASE2 = [
   { name: "Iron Golem", hp: 20, attack: 7, defense: 4 },
 ];
 
+// Inimigos comuns da fase 3.
 const ENEMIES_COMBAT_FASE3 = [
   { name: "Crystal Serpent", hp: 20, attack: 8, defense: 3 },
   { name: "Void Stalker", hp: 22, attack: 7, defense: 4 },
@@ -29,12 +35,14 @@ const ENEMIES_COMBAT_FASE3 = [
   { name: "Chaos Wisp", hp: 24, attack: 6, defense: 3 },
 ];
 
+// Bosses por fase. São usados quando state.combatBoss está ativo.
 const BOSS_BY_FASE = {
   1: { name: "Shadow Lord", hp: 25, attack: 8, defense: 4 },
   2: { name: "Eclipse Queen", hp: 32, attack: 10, defense: 5 },
-  3: { name: "Rei da Espiral", hp: 40, attack: 12, defense: 6 },
+  3: { name: "Rei Espiral", hp: 40, attack: 12, defense: 6 },
 };
 
+// Retorna o template de inimigo apropriado para o estado atual.
 function getEnemyTemplate(state) {
   if (state?.combatBoss) {
     return BOSS_BY_FASE[state.fase] || BOSS_BY_FASE[1];
@@ -58,6 +66,7 @@ function getEnemyTemplate(state) {
   };
 }
 
+// Cria o estado inicial da batalha baseado no estado global do jogo.
 function createCombatState(state) {
   if (!state) {
     throw new Error("turnManager.createCombatState requer um estado global válido.");
@@ -94,6 +103,7 @@ function createCombatState(state) {
   return battle;
 }
 
+// Sincroniza os valores de exibição entre o objeto de batalha e o estado global.
 function syncBattleSnapshot(battle, state) {
   if (!battle || !battle.player || !battle.enemy) return;
 
@@ -114,6 +124,7 @@ function syncBattleSnapshot(battle, state) {
   }
 }
 
+// Finaliza a batalha e ajusta a mensagem caso o jogador tenha vencido ou sido derrotado.
 function finalizeBattle(battle, state, venceu) {
   if (!battle) return;
 
@@ -130,11 +141,14 @@ function finalizeBattle(battle, state, venceu) {
   }
 }
 
+// Executa a ação do jogador e trata o contra-ataque do inimigo.
 function handlePlayerAction(state) {
   const battle = state?.combat;
   if (!battle || battle.finalizado) return false;
 
-  const damageDealt = battle.enemy.receiveAttack(battle.player.attackValue(TURN_ATTACK_BONUSES.player.min, TURN_ATTACK_BONUSES.player.max));
+  const damageDealt = battle.enemy.receiveAttack(
+    battle.player.attackValue(TURN_ATTACK_BONUSES.player.min, TURN_ATTACK_BONUSES.player.max)
+  );
   battle.mensagem = `Você atacou ${battle.enemy.name} e causou ${damageDealt} de dano.`;
   syncBattleSnapshot(battle, state);
 
@@ -143,7 +157,9 @@ function handlePlayerAction(state) {
     return true;
   }
 
-  const enemyDamage = battle.player.receiveAttack(battle.enemy.attackValue(TURN_ATTACK_BONUSES.enemy.min, TURN_ATTACK_BONUSES.enemy.max));
+  const enemyDamage = battle.player.receiveAttack(
+    battle.enemy.attackValue(TURN_ATTACK_BONUSES.enemy.min, TURN_ATTACK_BONUSES.enemy.max)
+  );
   battle.turn = TURN_STATES.ENEMY;
   battle.estado = battle.turn;
   battle.mensagem += `\n${battle.enemy.name} contra-atacou e causou ${enemyDamage} de dano.`;
@@ -161,6 +177,7 @@ function handlePlayerAction(state) {
   return true;
 }
 
+// Retorna informações de batalha atuais para renderização ou lógica externa.
 function getBattleInfo(state) {
   if (!state?.combat) return null;
   return state.combat;

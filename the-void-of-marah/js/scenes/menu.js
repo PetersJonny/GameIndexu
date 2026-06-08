@@ -1,4 +1,4 @@
-// js/scenes/menu.js
+// Renderiza a tela de menu principal com botões de iniciar, créditos e controle de volume.
 
 // Ajustes finos de posição (em pixels dentro dos 1920x1080)
 const POS_START_Y = 680; // Posição vertical do Start

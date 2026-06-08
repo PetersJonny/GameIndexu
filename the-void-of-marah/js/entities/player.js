@@ -1,3 +1,5 @@
+// js/entities/player.js
+// Classe que representa o jogador em combate, com HP, ataque e defesa.
 class Player {
   constructor(name, hp, attack, defense) {
     this.name = typeof name === "string" && name.length ? name : "Player";

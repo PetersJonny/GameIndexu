@@ -1,3 +1,5 @@
+// Define os itens que podem ser sorteados na recompensa gacha e aplica seus efeitos ao jogador.
+
 const GACHA_ITENS = [
   {
     nome: "Poção de Cura",
@@ -43,6 +45,7 @@ const GACHA_ITENS = [
   },
 ];
 
+// Retorna três itens aleatórios diferentes a partir da lista de gacha.
 function sortearItensGacha() {
   const copias = [...GACHA_ITENS];
   const itens = [];
@@ -55,6 +58,7 @@ function sortearItensGacha() {
   return itens;
 }
 
+// Aplica o bônus do item gacha ao estado do jogador.
 function aplicarBonusGacha(state, item) {
   if (!state || !state.stats || !item) {
     return;
@@ -70,6 +74,7 @@ function aplicarBonusGacha(state, item) {
   }
 }
 
+// Exposição pública para o sistema de gacha.
 window.gachaSystem = {
   GACHA_ITENS,
   gerarItensGacha: sortearItensGacha,

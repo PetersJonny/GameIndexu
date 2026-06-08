@@ -1,3 +1,5 @@
+// js/entities/enemies.js
+// Classe que representa inimigos em combate, incluindo HP, ataque e defesa.
 class Enemy {
   constructor(name, hp, attack, defense) {
     this.name = typeof name === "string" && name.length ? name : "Enemy";

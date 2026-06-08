@@ -1,3 +1,4 @@
+// Constantes de tamanho para o tabuleiro e os pisos desenhados.
 const LARGURA_PISO = 110;
 const ALTURA_PISO = 60;
 const ESPESSURA = 15;
@@ -11,6 +12,8 @@ const CASAS = {
   BOSS: { cor: "#9900ff" },
 };
 
+// Estado interno de movimento do jogador no tabuleiro.
+// Estado local de movimento do personagem, incluindo animações e escolhas de caminho.
 let controleMovimento = {
   passosRestantes: 0,
   timerAndar: 0,
@@ -26,6 +29,8 @@ let stateGlobal = null;
 let mouseXGlobal = 0;
 let mouseYGlobal = 0;
 
+// Gera o layout da fase 1 usando um grid com colunas e offsets de linha.
+// Gera o layout de casas para a fase 1 usando colunas com offsets de linha definidos.
 function gerarMalhaOrganica() {
   const layoutGrid = [
     [0],
@@ -80,6 +85,8 @@ function gerarMalhaOrganica() {
   return casas;
 }
 
+// Gera o layout da fase 2, mantendo o estilo orgânico com nova distribuição de caminhos.
+// Gera o layout de casas para a fase 2 mantendo estilo orgânico e distribuindo mais caminhos.
 function gerarMalhaOrganicaFase2() {
   const layoutGrid = [
     [0],
@@ -135,6 +142,8 @@ function gerarMalhaOrganicaFase2() {
   return casas;
 }
 
+// Gera o layout da fase 3 com uma malha semelhante às fases anteriores para manter coesão visual.
+// Gera o layout de casas para a fase 3 usando o mesmo estilo orgânico das fases anteriores.
 function gerarMalhaOrganicaFase3() {
   const layoutGrid = [
     [0],
@@ -201,11 +210,15 @@ const MAPA_FLUXO_FASE3 = {
   casas: gerarMalhaOrganicaFase3(),
 };
 
+// Seleciona o mapa do tabuleiro correto com base na fase atual do jogo.
+// Retorna o mapa de fluxo correto com base na fase atual do jogo.
 function getMapaFluxo(state) {
   if (state?.fase === 3) return MAPA_FLUXO_FASE3;
   return state?.fase === 2 ? MAPA_FLUXO_FASE2 : MAPA_FLUXO_FASE1;
 }
 
+// Renderiza o tabuleiro, incluindo fundo, conexões, casas, personagem, HUD e botão de rolar dado.
+// Desenha a cena principal do tabuleiro: fundo, caminhos, casas, personagem e HUD.
 function renderBoard(ctx, assets, state, mouseX, mouseY) {
   stateGlobal = state;
   mouseXGlobal = mouseX;
@@ -268,6 +281,7 @@ function renderBoard(ctx, assets, state, mouseX, mouseY) {
   }
 }
 
+// Inicia a rolagem do dado e bloqueia novas ações até o resultado ser definido.
 function rolarDado() {
   if (
     controleMovimento.passosRestantes > 0 ||
@@ -318,6 +332,7 @@ function rolarDado() {
   }, 1500);
 }
 
+// Atualiza o movimento do jogador no tabuleiro: anima salto, executa passos e solicita escolha quando necessário.
 function processarMovimentoBoard(state, mapa) {
   if (controleMovimento.animandoPulo) {
     controleMovimento.puloProgresso += 0.05;
@@ -365,6 +380,7 @@ function processarMovimentoBoard(state, mapa) {
   }
 }
 
+// Executa o evento vinculado à casa atual: gacha, combate, boss ou recuperação.
 function aplicarEfeitoDaCasa(casa) {
   if (casa.tipo === CASAS.GACHA) {
     if (stateGlobal) {
@@ -400,6 +416,7 @@ function aplicarEfeitoDaCasa(casa) {
   }
 }
 
+// Desenha linhas tracejadas entre casas conectadas para mostrar os caminhos possíveis.
 function desenharConexoes(ctx, mapa) {
   ctx.save();
   ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
@@ -420,6 +437,7 @@ function desenharConexoes(ctx, mapa) {
   ctx.restore();
 }
 
+// Desenha sombra por baixo do piso para criar sensação de profundidade.
 function desenharSombra(ctx, x, y, scale = 1.0) {
   const w = LARGURA_PISO * scale;
   const h = ALTURA_PISO * scale;
@@ -440,6 +458,7 @@ function desenharSombra(ctx, x, y, scale = 1.0) {
   ctx.restore();
 }
 
+// Desenha cada bloco do tabuleiro com perspectiva e brilho, alterando o estilo se estiver em destaque.
 function desenharBloco(ctx, x, y, corBase, destaque, scale = 1.0) {
   const w = LARGURA_PISO * scale;
   const h = ALTURA_PISO * scale;
@@ -478,6 +497,7 @@ function desenharBloco(ctx, x, y, corBase, destaque, scale = 1.0) {
   ctx.restore();
 }
 
+// Desenha o personagem na casa atual ou no arco de salto durante a animação.
 function renderPersonagem(ctx, assets, state, mapa) {
   const img =
     state.personagemSelecionado === "maya" ? assets.card1 : assets.card2;
@@ -510,6 +530,7 @@ function renderPersonagem(ctx, assets, state, mapa) {
   }
 }
 
+// Mostra dados do jogador como nome, vida e defesa no painel inferior.
 function renderHUD(ctx, state) {
   ctx.save();
   ctx.textAlign = "left";
@@ -533,6 +554,7 @@ function renderHUD(ctx, state) {
   ctx.restore();
 }
 
+// Gera uma variação mais escura de uma cor hexadecimal para criar sombras e bordas.
 function escurecerCor(hex, amt) {
   let num = parseInt(hex.slice(1), 16),
     r = (num >> 16) - amt,

@@ -1,3 +1,4 @@
+// Constantes de layout para o botão de ataque / continuar.
 const COMBAT_BUTTON = {
   x: 1340,
   y: 905,
@@ -16,6 +17,7 @@ const ENEMIGOS_COMBAT = [
   { name: "Wraith", hp: 16, attack: 5, defense: 1 },
 ];
 
+// Renderiza a cena de combate, inicializa a batalha se necessário e desenha HUD + botão.
 function renderCombat(ctx, assets, state, mouseX, mouseY) {
   combateStateGlobal = state;
   combateMouseXGlobal = mouseX;
@@ -30,10 +32,12 @@ function renderCombat(ctx, assets, state, mouseX, mouseY) {
   desenharBotaoAtaque(ctx, state);
 }
 
+// Cria o estado inicial da batalha a partir do estado global do jogo.
 function iniciarCombate(state) {
   state.combat = turnManager.createCombatState(state);
 }
 
+// Desenha o plano de fundo do combate e os painéis de inimigo/jogador.
 function desenharCenarioCombate(ctx, state) {
   ctx.fillStyle = "#a4c3f2";
   ctx.fillRect(0, 0, 1920, 1080);
@@ -52,6 +56,7 @@ function desenharCenarioCombate(ctx, state) {
   ctx.fillText("JOGADOR", 140, 570);
 }
 
+// Desenha o HUD de combate com nome, barras de vida e texto de mensagem.
 function desenharHUDCombate(ctx, state) {
   const combat = state.combat;
 
@@ -86,6 +91,7 @@ function desenharBarraVida(ctx, x, y, width, height, current, max, color) {
   ctx.strokeRect(x, y, width, height);
 }
 
+// Desenha o botão que o jogador usa para atacar ou continuar após o fim da batalha.
 function desenharBotaoAtaque(ctx, state) {
   const combat = state.combat;
   const isHover =
@@ -112,14 +118,17 @@ function desenharBotaoAtaque(ctx, state) {
   ctx.textAlign = "start";
 }
 
+// Chama a lógica do turno do jogador para executar o ataque.
 function executarAtaque(state) {
   turnManager.handlePlayerAction(state);
 }
 
+// Finaliza a batalha e atualiza o estado com vitória ou derrota.
 function finalizarCombate(state, venceu) {
   turnManager.finalizeBattle(state.combat, state, venceu);
 }
 
+// Após o combate, decide o próximo passo: seguir ao tabuleiro, avançar de fase ou reiniciar.
 function continuarDepoisDoCombate(state) {
   const combat = state.combat;
   if (!combat || !combat.finalizado) return;

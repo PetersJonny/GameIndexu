@@ -1,3 +1,5 @@
+// Gerencia o salvamento e carregamento simples do progresso usando localStorage.
+
 function salvarProgresso() {
   const dados = {
     casaAtual: state.casaAtual,
@@ -5,6 +7,7 @@ function salvarProgresso() {
     fase: state.fase,
     stats: state.stats,
   };
+
   localStorage.setItem("marah_void_save", JSON.stringify(dados));
 }
 
@@ -18,5 +21,6 @@ function carregarProgresso() {
     state.stats = dados.stats;
     return true;
   }
+
   return false;
 }

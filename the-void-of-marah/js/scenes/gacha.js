@@ -1,3 +1,4 @@
+// Constantes de layout da tela de gacha, com posições e dimensões dos cards e botão.
 const GACHA_CARD_WIDTH = 420;
 const GACHA_CARD_HEIGHT = 520;
 const GACHA_CARD_Y = 240;
@@ -9,6 +10,7 @@ const GACHA_BUTTON = {
   height: 110,
 };
 
+// Inicializa o estado do gacha se ainda não existir, sorteando três itens disponíveis.
 function inicializarGacha(state) {
   if (!state.gacha) {
     state.gacha = {
@@ -22,6 +24,7 @@ function inicializarGacha(state) {
   return state.gacha;
 }
 
+// Renderiza a tela de gacha com cards, seleção e botão de confirmação.
 function renderGacha(ctx, state, mouseX, mouseY) {
   const gacha = inicializarGacha(state);
 
@@ -103,6 +106,7 @@ function renderGacha(ctx, state, mouseX, mouseY) {
   ctx.fillText(canConfirm ? "CONFIRMAR" : "ESCOLHA UM ITEM", GACHA_BUTTON.x + GACHA_BUTTON.width / 2, GACHA_BUTTON.y + 68);
 }
 
+// Divide texto em múltiplas linhas para ajuste dentro do card de gacha.
 function wrapTextGacha(ctx, text, x, y, maxWidth, lineHeight) {
   const palavras = text.split(" ");
   let linha = "";
@@ -121,6 +125,7 @@ function wrapTextGacha(ctx, text, x, y, maxWidth, lineHeight) {
   ctx.fillText(linha, x, y);
 }
 
+// Marca um item do gacha como selecionado e atualiza a mensagem de confirmação.
 function selecionarItemGacha(index) {
   if (!state || !state.gacha || state.gacha.aplicado) return;
 
@@ -128,6 +133,7 @@ function selecionarItemGacha(index) {
   state.gacha.mensagem = `Você selecionou ${state.gacha.itens[index].nome}. Confirme para receber o bônus.`;
 }
 
+// Aplica o bônus do item selecionado ao estado do jogador e retorna para a cena do tabuleiro.
 function confirmarGacha() {
   if (!state || !state.gacha || state.gacha.aplicado || state.gacha.selecionado === null) return;
 
@@ -140,6 +146,7 @@ function confirmarGacha() {
   state.emTransicao = true;
 }
 
+// Captura clique do mouse na tela de gacha: seleciona o card ou confirma a escolha.
 window.addEventListener("mousedown", (event) => {
   if (!state || state.cena !== "gacha" || state.emTransicao || event.button !== 0) return;
 

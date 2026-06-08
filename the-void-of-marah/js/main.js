@@ -1,4 +1,5 @@
-// js/main.js
+// Ponto de entrada principal: inicializa canvas, estado global e faz o loop do jogo.
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -104,6 +105,7 @@ function loop() {
 /**
  * Gerencia o efeito de fade-in e fade-out entre as cenas
  */
+// Controla o fade entre cenas quando o jogo muda de estado.
 function gerenciarTransicao() {
   if (state.emTransicao) {
     state.transicao += 0.05;
@@ -132,6 +134,7 @@ canvas.addEventListener("mousemove", (e) => {
   mousePos.y = (e.clientY - rect.top) * (1080 / rect.height);
 });
 
+// Captura cliques do mouse para menus, seleção de personagem e ajustes de volume.
 canvas.addEventListener("mousedown", (e) => {
   if (state.emTransicao) return;
 

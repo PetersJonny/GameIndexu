@@ -1,3 +1,5 @@
+// Renderiza a tela de seleção de personagem com dois cards interativos.
+
 // Configurações dos Cards
 const CARD_W = 650;
 const CARD_H = 700;

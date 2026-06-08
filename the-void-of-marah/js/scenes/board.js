@@ -91,9 +91,11 @@ function gerarMalhaOrganicaFase2() {
     [2, 4],
     [1, 3, 5],
     [2, 4],
-    [1, 3],
-    [0, 2],
-    [1],
+    [1, 3, 5],
+    [0, 2, 4],
+    [-1, 1, 3],
+    [-2, 0, 2],
+    [-1, 1],
     [0],
   ];
 
@@ -110,10 +112,62 @@ function gerarMalhaOrganicaFase2() {
       let tipo = CASAS.NORMAL;
       if (c === 0) tipo = CASAS.CHECKPOINT;
       else if (c === layoutGrid.length - 1) tipo = CASAS.BOSS;
-      else if (c === 5 && r === 3) tipo = CASAS.RECOVERY;
-      else if (idCounter % 9 === 0) tipo = CASAS.GACHA;
-      else if (idCounter % 6 === 0) tipo = CASAS.COMBAT;
+      else if (c === 6 && r === 4) tipo = CASAS.RECOVERY;
+      else if (c === 10 && r === 0) tipo = CASAS.RECOVERY;
+      else if (idCounter % 7 === 0) tipo = CASAS.GACHA;
+      else if (idCounter % 5 === 0) tipo = CASAS.COMBAT;
       else if (idCounter % 11 === 0) tipo = CASAS.RECOVERY;
+
+      casas.push({ id: idCounter, c, r, x, y, tipo, proximas: [] });
+      idCounter++;
+    }
+  }
+
+  casas.forEach((casa) => {
+    let casasNaProximaColuna = casas.filter((n) => n.c === casa.c + 1);
+    casasNaProximaColuna.forEach((proxima) => {
+      if (proxima.r === casa.r - 1 || proxima.r === casa.r + 1) {
+        casa.proximas.push(proxima.id);
+      }
+    });
+  });
+
+  return casas;
+}
+
+function gerarMalhaOrganicaFase3() {
+  const layoutGrid = [
+    [0],
+    [-1, 1],
+    [-2, 0, 2],
+    [-3, -1, 1, 3],
+    [-4, 0, 4],
+    [-3, -1, 1, 3],
+    [-4, -2, 2, 4],
+    [-3, 1, 3],
+    [-2, 0, 2],
+    [-1, 1],
+    [0],
+  ];
+
+  let casas = [];
+  let idCounter = 0;
+
+  for (let c = 0; c < layoutGrid.length; c++) {
+    for (let i = 0; i < layoutGrid[c].length; i++) {
+      let r = layoutGrid[c][i];
+
+      let x = 140 + c * 120;
+      let y = 520 + r * 55;
+
+      let tipo = CASAS.NORMAL;
+      if (c === 0) tipo = CASAS.CHECKPOINT;
+      else if (c === layoutGrid.length - 1) tipo = CASAS.BOSS;
+      else if (c === 7 && r === 1) tipo = CASAS.RECOVERY;
+      else if (c === 4 && r === 0) tipo = CASAS.RECOVERY;
+      else if (idCounter % 8 === 0) tipo = CASAS.GACHA;
+      else if (idCounter % 5 === 0) tipo = CASAS.COMBAT;
+      else if (idCounter % 10 === 0) tipo = CASAS.RECOVERY;
 
       casas.push({ id: idCounter, c, r, x, y, tipo, proximas: [] });
       idCounter++;
@@ -142,7 +196,13 @@ const MAPA_FLUXO_FASE2 = {
   casas: gerarMalhaOrganicaFase2(),
 };
 
+const MAPA_FLUXO_FASE3 = {
+  nome: "The Void - Espiral Abissal",
+  casas: gerarMalhaOrganicaFase3(),
+};
+
 function getMapaFluxo(state) {
+  if (state?.fase === 3) return MAPA_FLUXO_FASE3;
   return state?.fase === 2 ? MAPA_FLUXO_FASE2 : MAPA_FLUXO_FASE1;
 }
 
@@ -325,8 +385,13 @@ function aplicarEfeitoDaCasa(casa) {
       stateGlobal.emTransicao = true;
       stateGlobal.combat = null;
       stateGlobal.combatBoss = true;
-      stateGlobal.bossTransition =
-        stateGlobal.fase === 1 ? "paraFase2" : "reiniciar";
+      if (stateGlobal.fase === 1) {
+        stateGlobal.bossTransition = "paraFase2";
+      } else if (stateGlobal.fase === 2) {
+        stateGlobal.bossTransition = "paraFase3";
+      } else {
+        stateGlobal.bossTransition = "reiniciar";
+      }
     }
   } else if (casa.tipo === CASAS.RECOVERY) {
     if (stateGlobal && stateGlobal.stats) {

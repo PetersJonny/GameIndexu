@@ -19,12 +19,20 @@ const ENEMIES_COMBAT_FASE2 = [
   { name: "Flame Bat", hp: 14, attack: 6, defense: 2 },
   { name: "Spectral Knight", hp: 18, attack: 6, defense: 3 },
   { name: "Viper Mage", hp: 16, attack: 7, defense: 2 },
-  { name: "Iron Golem", hp: 22, attack: 7, defense: 4 },
+  { name: "Iron Golem", hp: 20, attack: 7, defense: 4 },
+];
+
+const ENEMIES_COMBAT_FASE3 = [
+  { name: "Crystal Serpent", hp: 20, attack: 8, defense: 3 },
+  { name: "Void Stalker", hp: 22, attack: 7, defense: 4 },
+  { name: "Abyssal Archer", hp: 18, attack: 9, defense: 2 },
+  { name: "Chaos Wisp", hp: 24, attack: 6, defense: 3 },
 ];
 
 const BOSS_BY_FASE = {
   1: { name: "Shadow Lord", hp: 25, attack: 8, defense: 4 },
   2: { name: "Eclipse Queen", hp: 32, attack: 10, defense: 5 },
+  3: { name: "Rei da Espiral", hp: 40, attack: 12, defense: 6 },
 };
 
 function getEnemyTemplate(state) {
@@ -32,7 +40,15 @@ function getEnemyTemplate(state) {
     return BOSS_BY_FASE[state.fase] || BOSS_BY_FASE[1];
   }
 
-  const pool = state?.fase === 2 ? ENEMIES_COMBAT_FASE2 : ENEMIES_COMBAT;
+  let pool;
+  if (state?.fase === 3) {
+    pool = ENEMIES_COMBAT_FASE3;
+  } else if (state?.fase === 2) {
+    pool = ENEMIES_COMBAT_FASE2;
+  } else {
+    pool = ENEMIES_COMBAT;
+  }
+
   const enemyData = pool[Math.floor(Math.random() * pool.length)];
   return {
     name: enemyData.name,

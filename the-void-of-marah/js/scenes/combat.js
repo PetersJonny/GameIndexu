@@ -137,6 +137,18 @@ function continuarDepoisDoCombate(state) {
       controleMovimento.casaOrigem = null;
       controleMovimento.casaDestino = null;
       state.bossTransition = null;
+    } else if (state.bossTransition === "paraFase3") {
+      state.fase = 3;
+      state.casaAtual = 0;
+      state.opcoesDeCaminho = [];
+      controleMovimento.passosRestantes = 0;
+      controleMovimento.esperandoEscolha = false;
+      controleMovimento.dadoAtivo = false;
+      controleMovimento.animandoPulo = false;
+      controleMovimento.puloProgresso = 0;
+      controleMovimento.casaOrigem = null;
+      controleMovimento.casaDestino = null;
+      state.bossTransition = null;
     } else if (state.bossTransition === "reiniciar") {
       state.casaAtual = 0;
       state.opcoesDeCaminho = [];

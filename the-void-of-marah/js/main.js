@@ -53,13 +53,13 @@ const assets = {
   card4: new Image(),
 };
 
-assets.fundo.src = "assets/drawings/TitleScreenUI/background/TelaInicial.png";
+assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
 assets.fundoSelecao.src =
   "assets/drawings/selectScreenUI/background/FundoSelecao.png";
 assets.fundoBoard.src = "assets/bg/FundoBoard.png";
-assets.btnStart.src = "assets/drawings/TitleScreenUI/buttons/btn_start.png";
+assets.btnStart.src = "assets/drawings/titleScreenUI/buttons/btn_start.png";
 assets.btnCreditos.src =
-  "assets/drawings/TitleScreenUI/buttons/btn_creditos.png";
+  "assets/drawings/titleScreenUI/buttons/btn_creditos.png";
 assets.card1.src =
   "assets/drawings/selectScreenUI/selectCard/MayaSelectCard.png";
 assets.card2.src =

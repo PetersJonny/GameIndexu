@@ -72,6 +72,10 @@ assets.card1.src =
   "assets/drawings/selectScreenUI/selectCard/MayaSelectCard.png";
 assets.card2.src =
   "assets/drawings/selectScreenUI/selectCard/ZeckSelectCard.png";
+assets.card3.src =
+  "assets/drawings/selectScreenUI/selectCard/MayaChibiTab.png";
+assets.card4.src =
+  "assets/drawings/selectScreenUI/selectCard/ZackChibiTab.png";  
 
 /**
  * Loop Principal do Jogo

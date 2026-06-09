@@ -500,7 +500,7 @@ function desenharBloco(ctx, x, y, corBase, destaque, scale = 1.0) {
 // Desenha o personagem na casa atual ou no arco de salto durante a animação.
 function renderPersonagem(ctx, assets, state, mapa) {
   const img =
-    state.personagemSelecionado === "maya" ? assets.card1 : assets.card2;
+    state.personagemSelecionado === "maya" ? assets.card3 : assets.card4;
   if (!img || !img.complete) return;
 
   if (controleMovimento.animandoPulo) {

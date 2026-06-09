@@ -2,10 +2,10 @@
 const GACHA_CARD_WIDTH = 420;
 const GACHA_CARD_HEIGHT = 520;
 const GACHA_CARD_Y = 240;
-const GACHA_CARD_X = [260, 830, 1400];
+const GACHA_CARD_X = [180, 750, 1320];
 const GACHA_BUTTON = {
-  x: 760,
-  y: 900,
+  x: 750,
+  y: 800,
   width: 400,
   height: 110,
 };

@@ -166,7 +166,8 @@ function gerarMalhaOrganicaFase3() {
     for (let i = 0; i < layoutGrid[c].length; i++) {
       let r = layoutGrid[c][i];
 
-      let x = 140 + c * 120;
+      // --- AJUSTE APENAS AQUI: Mudei de 140 para 350 ---
+      let x = 350 + c * 120;
       let y = 520 + r * 55;
 
       let tipo = CASAS.NORMAL;
@@ -343,17 +344,27 @@ function processarMovimentoBoard(state, mapa) {
       state.casaAtual = controleMovimento.casaDestino;
       controleMovimento.passosRestantes--;
 
-      if (controleMovimento.passosRestantes === 0) {
-        const novaCasa = mapa.casas.find((c) => c.id === state.casaAtual);
+      const novaCasa = mapa.casas.find((c) => c.id === state.casaAtual);
+
+      // --- MÁGICA AQUI ---
+      // Se for Combate ou Boss, interrompe a caminhada na hora e puxa a luta!
+      if (novaCasa.tipo === CASAS.COMBAT || novaCasa.tipo === CASAS.BOSS) {
+        aplicarEfeitoDaCasa(novaCasa);
+      } 
+      // Se for uma casa comum (Gacha, Recovery), só ativa se os passos acabarem
+      else if (controleMovimento.passosRestantes === 0) {
         aplicarEfeitoDaCasa(novaCasa);
       }
     }
     return;
   }
 
+  // Só continua andando se tiver passos, se não estiver esperando escolha
+  // E se a tela não estiver em transição (indo pro combate)
   if (
     controleMovimento.passosRestantes <= 0 ||
-    controleMovimento.esperandoEscolha
+    controleMovimento.esperandoEscolha ||
+    state.emTransicao
   )
     return;
 
@@ -542,6 +553,9 @@ function renderHUD(ctx, state) {
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
 
+  // Garante que a suavização de imagem está desligada para os ícones ficarem nítidos
+  ctx.imageSmoothingEnabled = false;
+
   ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
   ctx.fillRect(50, 880, 480, 150);
 
@@ -551,11 +565,27 @@ function renderHUD(ctx, state) {
 
   ctx.font = "24px sans-serif";
 
+  // --- ÍCONE E TEXTO DE VIDA ---
+  if (assets.iconVida && assets.iconVida.complete) {
+    ctx.drawImage(assets.iconVida, 80, 965, 32, 32);
+  }
   ctx.fillStyle = "#ff5555";
-  ctx.fillText(`❤ VIDA: ${state.stats.vida}/${state.stats.vidaMax}`, 80, 970);
+  ctx.fillText(`VIDA: ${state.stats.vida}/${state.stats.vidaMax}`, 120, 970);
 
+  // --- ÍCONE E TEXTO DE DANO (ATAQUE) ---
+  // Posicionado no X: 290 (mesma coluna da defesa) e Y: 910 (acima dela)
+  if (assets.iconDano && assets.iconDano.complete) {
+    ctx.drawImage(assets.iconDano, 290, 910, 32, 32);
+  }
+  ctx.fillStyle = "#ffcc00"; // Cor amarelo/laranja para destacar o dano
+  ctx.fillText(`DANO: ${state.stats.ataque}`, 330, 915);
+
+  // --- ÍCONE E TEXTO DE DEFESA ---
+  if (assets.iconDefesa && assets.iconDefesa.complete) {
+    ctx.drawImage(assets.iconDefesa, 290, 965, 32, 32);
+  }
   ctx.fillStyle = "#55ccff";
-  ctx.fillText(`🛡 DEFESA: ${state.stats.defesa}`, 280, 970);
+  ctx.fillText(`DEFESA: ${state.stats.defesa}`, 330, 970);
 
   ctx.restore();
 }

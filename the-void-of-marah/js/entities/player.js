@@ -1,5 +1,3 @@
-// js/entities/player.js
-// Classe que representa o jogador em combate, com HP, ataque e defesa.
 class Player {
   constructor(name, hp, attack, defense) {
     this.name = typeof name === "string" && name.length ? name : "Player";
@@ -18,7 +16,7 @@ class Player {
   }
 
   takeDamage(amount) {
-    const damage = Math.max(1, Math.round(amount));
+    const damage = Math.max(1, Math.round(amount)); // Dano mínimo é sempre 1
     this.hp = Math.max(0, this.hp - damage);
     return damage;
   }
@@ -33,13 +31,12 @@ class Player {
     return healed;
   }
 
-  attackValue(minBonus = 0, maxBonus = 2) {
-    const bonus = Math.floor(Math.random() * (maxBonus - minBonus + 1)) + minBonus;
-    return this.attack + bonus;
+  attackValue(danoHabilidade = 0) {
+    return this.attack + danoHabilidade; 
   }
 
-  attack(target, minBonus = 0, maxBonus = 2) {
-    return target.receiveAttack(this.attackValue(minBonus, maxBonus));
+  attack(target, danoHabilidade = 0) {
+    return target.receiveAttack(this.attackValue(danoHabilidade));
   }
 
   resetHp() {

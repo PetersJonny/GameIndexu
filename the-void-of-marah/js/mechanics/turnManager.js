@@ -146,10 +146,12 @@ function handlePlayerAction(state) {
   const battle = state?.combat;
   if (!battle || battle.finalizado) return false;
 
-  const damageDealt = battle.enemy.receiveAttack(
-    battle.player.attackValue(TURN_ATTACK_BONUSES.player.min, TURN_ATTACK_BONUSES.player.max)
-  );
-  battle.mensagem = `Você atacou ${battle.enemy.name} e causou ${damageDealt} de dano.`;
+  // --- JOGADOR ATACA ---
+  // O soco dá +2 de dano fixo somado ao ataque base do jogador!
+  const poderDoSoco = 2; 
+  const damageDealt = battle.enemy.receiveAttack(battle.player.attackValue(poderDoSoco));
+  
+  battle.mensagem = `Você usou SOCO em ${battle.enemy.name} e causou ${damageDealt} de dano.`;
   syncBattleSnapshot(battle, state);
 
   if (!battle.enemy.isAlive) {
@@ -157,9 +159,11 @@ function handlePlayerAction(state) {
     return true;
   }
 
-  const enemyDamage = battle.player.receiveAttack(
-    battle.enemy.attackValue(TURN_ATTACK_BONUSES.enemy.min, TURN_ATTACK_BONUSES.enemy.max)
-  );
+  // --- INIMIGO CONTRA-ATACA ---
+  // Inimigo ataca usando apenas a força base dele (+0 de bônus)
+  const poderInimigo = 0;
+  const enemyDamage = battle.player.receiveAttack(battle.enemy.attackValue(poderInimigo));
+  
   battle.turn = TURN_STATES.ENEMY;
   battle.estado = battle.turn;
   battle.mensagem += `\n${battle.enemy.name} contra-atacou e causou ${enemyDamage} de dano.`;

@@ -88,13 +88,14 @@ function desenharHUDCombate(ctx, state) {
   ctx.fillStyle = "#1f1f2b";
   ctx.font = "bold 38px sans-serif";
   const nomePlayer = state.personagemSelecionado?.toUpperCase() || "PLAYER";
-  ctx.fillText(`${nomePlayer}  |  DEFESA: ${combat.playerDefense || state.stats?.defesa || 0}`, 550, playerBarY - 20);
+  
+  // Aqui está a mágica: Adicionamos o "DANO" ao lado da Defesa!
+  ctx.fillText(`${nomePlayer}  |  DEFESA: ${combat.playerDefense || state.stats?.defesa || 0}  |  DANO: ${state.stats?.ataque || 0}`, 550, playerBarY - 20);
   
   desenharBarraVida(ctx, 550, playerBarY, 1000, 40, combat.playerHP, combat.playerMaxHP, "#66b3ff");
   ctx.font = "bold 24px sans-serif";
   ctx.fillStyle = "white";
   ctx.fillText(`HP: ${combat.playerHP}/${combat.playerMaxHP}`, 560, playerBarY + 28);
-
 
   // ---- CAIXA DE MENSAGEM ----
   ctx.font = "28px sans-serif";
@@ -195,6 +196,7 @@ function continuarDepoisDoCombate(state) {
   if (!combat || !combat.finalizado) return;
 
   if (combat.venceu) {
+    // Se for Boss, passa de fase e zera o movimento
     if (state.bossTransition === "paraFase2") {
       state.fase = 2;
       state.casaAtual = 0;
@@ -230,9 +232,15 @@ function continuarDepoisDoCombate(state) {
       controleMovimento.casaOrigem = null;
       controleMovimento.casaDestino = null;
       state.bossTransition = null;
+    } 
+    // Se for um Inimigo Comum, apenas reseta a flag de boss e NÃO ZERA OS PASSOS.
+    else {
+      state.bossTransition = null;
     }
+    
     state.proximaCena = "jogo";
   } else {
+    // Se perdeu, zera tudo e volta pro começo do tabuleiro
     state.stats.vida = state.stats.vidaMax;
     state.casaAtual = 0;
     state.opcoesDeCaminho = [];

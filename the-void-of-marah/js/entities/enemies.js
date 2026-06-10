@@ -1,5 +1,3 @@
-// js/entities/enemies.js
-// Classe que representa inimigos em combate, incluindo HP, ataque e defesa.
 class Enemy {
   constructor(name, hp, attack, defense) {
     this.name = typeof name === "string" && name.length ? name : "Enemy";
@@ -33,13 +31,12 @@ class Enemy {
     return healed;
   }
 
-  attackValue(minBonus = 0, maxBonus = 1) {
-    const bonus = Math.floor(Math.random() * (maxBonus - minBonus + 1)) + minBonus;
-    return this.attack + bonus;
+  attackValue(danoHabilidade = 0) {
+    return this.attack + danoHabilidade;
   }
 
-  attack(target, minBonus = 0, maxBonus = 1) {
-    return target.receiveAttack(this.attackValue(minBonus, maxBonus));
+  attack(target, danoHabilidade = 0) {
+    return target.receiveAttack(this.attackValue(danoHabilidade));
   }
 
   resetHp() {

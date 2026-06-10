@@ -43,6 +43,11 @@ function inicializarCutscenes() {
   configCutscene.imagensSrc.forEach((src, index) => {
     const img = new Image();
     img.src = src;
+
+    img.onerror = () => {
+      console.error("Erro ao carregar a imagem em: " + src);
+    };
+
     img.onload = () => {
       carregadasCounter++;
       if (carregadasCounter === configCutscene.imagensSrc.length) {

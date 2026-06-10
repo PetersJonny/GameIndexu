@@ -2,7 +2,7 @@
 
 const GACHA_ITENS = [
   {
-    nome: "Poção de Cura",
+    nome: "Maçã do  Amor",
     tipo: "vida",
     valor: 3,
     descricao: "Recupera 3 pontos de vida máxima e cura imediatamente o mesmo valor.",

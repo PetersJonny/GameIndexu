@@ -63,6 +63,7 @@ const assets = {
   cardGachaDef: new Image(),
   fundoGacha: new Image(),
   musica_de_fundo: new Audio("assets/sounds/phantasticbeats-rpg-city-8381.mp3"), 
+  musica_de_inicial: new Audio("assets/sounds/rubyzephyr-fantasy-rpg-exploration-v2-461303.mp3"), 
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
@@ -102,6 +103,9 @@ function loop() {
   // Renderização por Cena
   if (state.cena === "menu") {
     renderMenu(ctx, assets, state, mousePos.x, mousePos.y);
+    assets.musica_de_inicial.loop = true;
+    assets.musica_de_inicial.play();
+    assets.musica_de_inicial.volume = state.mutado ? 0 : state.volume / 10;
   } else if (state.cena === "cutscene") {
     renderCutscene(ctx);
   } else if (state.cena === "selecao") {
@@ -163,6 +167,7 @@ canvas.addEventListener("mousedown", (e) => {
     } else if (acao === "creditos") {
       state.proximaCena = "creditos";
       state.emTransicao = true;
+      assets.musica_de_fundo.pause();
     } else if (acao === "mudar_mudo") {
       alternarMute();
     } else if (acao === "aumentar") {
@@ -177,6 +182,7 @@ canvas.addEventListener("mousedown", (e) => {
     if (acao === "proxima_cena") {
       state.proximaCena = "selecao";
       state.emTransicao = true;
+      assets.musica_de_inicial.pause();
     }
   } else if (state.cena === "selecao") {
     const escolha = checkSelecaoClick(mousePos.x, mousePos.y);

@@ -62,6 +62,7 @@ const assets = {
   cardGachaAtk: new Image(),
   cardGachaDef: new Image(),
   fundoGacha: new Image(),
+  musica_de_fundo: new Audio("assets/sounds/phantasticbeats-rpg-city-8381.mp3"), 
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
@@ -109,6 +110,9 @@ function loop() {
     renderCreditos(ctx);
   } else if (state.cena === "jogo") {
     renderBoard(ctx, assets, state, mousePos.x, mousePos.y);
+    assets.musica_de_fundo.loop = true;
+    assets.musica_de_fundo.play();
+    assets.musica_de_fundo.volume = state.mutado ? 0 : state.volume / 10;
   } else if (state.cena === "combat") {
     renderCombat(ctx, assets, state, mousePos.x, mousePos.y);
   } else if (state.cena === "gacha") {

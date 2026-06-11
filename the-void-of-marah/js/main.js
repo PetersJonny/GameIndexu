@@ -57,6 +57,9 @@ const assets = {
   iconVida: new Image(),
   iconDefesa: new Image(),
   iconDano: new Image(),
+  cardGachaAtk: new Image(),
+  cardGachaDef: new Image(),
+  fundoGacha: new Image(),
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
@@ -77,7 +80,7 @@ assets.iconDefesa.src = "assets/pixel_art/ui/escudo pixelart.png";
 assets.iconDano.src = "assets/pixel_art/ui/espada pixelart.png";
 assets.cardGachaAtk.src = "assets/pixel_art/gacha/cartaataque.png";
 assets.cardGachaDef.src = "assets/pixel_art/gacha/Cartadefesa.png";
-assets.fundoGacha.src = "";
+assets.fundoGacha.src = "assets/pixel_art/gacha/fundo_do_felipe.png";
 
 
 

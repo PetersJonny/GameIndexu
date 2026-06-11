@@ -54,6 +54,8 @@ const assets = {
   card2: new Image(),
   card3: new Image(),
   card4: new Image(),
+  slime: new Image(),
+  bossShadowLord: new Image(),
   iconVida: new Image(),
   iconDefesa: new Image(),
   iconDano: new Image(),
@@ -75,6 +77,8 @@ assets.card2.src =
   "assets/drawings/selectScreenUI/selectCard/ZeckSelectCard.png";
 assets.card3.src = "assets/drawings/chars/MayaChibiTab.png";
 assets.card4.src = "assets/drawings/chars/ZeckChibiTab.png";
+assets.slime.src = "assets/drawings/bosses/SlimeCombat.png";
+assets.bossShadowLord.src = "assets/drawings/bosses/boss_shadow.png";
 assets.iconVida.src = "assets/pixel_art/ui/coração pixelart.png";
 assets.iconDefesa.src = "assets/pixel_art/ui/escudo pixelart.png";
 assets.iconDano.src = "assets/pixel_art/ui/espada pixelart.png";

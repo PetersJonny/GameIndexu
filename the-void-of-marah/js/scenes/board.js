@@ -264,6 +264,25 @@ function renderBoard(ctx, assets, state, mouseX, mouseY) {
     ctx.fillText("ROLAR DADO", 960, 980);
     ctx.restore();
   }
+
+  //BUTAUM VOLUME
+  const centroX = 160;
+  const POS_VOLUME_Y = 70;
+  // 2. UI de Volume
+  ctx.fillStyle = "white";
+  ctx.font = "bold 45px Arial";
+  ctx.textAlign = "center";
+  let icone = state.mutado || state.volume === 0 ? "🔇" : "🔊";
+
+  ctx.fillText(icone, centroX - DISTANCIA_X_UI * 1.5, POS_VOLUME_Y);
+  ctx.fillText("-", centroX - DISTANCIA_X_UI * 0.5, POS_VOLUME_Y);
+  ctx.fillText(
+    state.volume.toString(),
+    centroX + DISTANCIA_X_UI * 0.5,
+    POS_VOLUME_Y,
+  );
+  ctx.fillText("+", centroX + DISTANCIA_X_UI * 1.5, POS_VOLUME_Y);
+  
 }
 
 function rolarDado() {
@@ -542,8 +561,7 @@ function escurecerCor(hex, amt) {
 }
 
 window.addEventListener("mousedown", () => {
-  if (!stateGlobal || stateGlobal.cena !== "jogo") return;
-
+  if (!stateGlobal || stateGlobal.cena !== "jogo") return;  
   // Botão Rolar Dado
   if (
     controleMovimento.passosRestantes === 0 &&
@@ -561,6 +579,21 @@ window.addEventListener("mousedown", () => {
       return;
     }
   }
+  
+   const acao = checkBoardClick(mousePos.x, mousePos.y);
+    
+    if (acao === "mudar_mudo") {
+      alternarMute();
+    } else if (acao === "aumentar") {
+      if (state.volume < 10) state.volume++;
+      state.mutado = false;
+    } else if (acao === "diminuir") {
+      if (state.volume > 0) state.volume--;
+      if (state.volume === 0) state.mutado = true;
+    } else if (acao === "rolar_dado") {
+      // Aqui você pode disparar a função que rola o seu dado!
+      console.log("Dado clicado!"); 
+    }
 
   // Correção aqui: Adicionamos a verificação de segurança stateGlobal.opcoesDeCaminho
   if (controleMovimento.esperandoEscolha && stateGlobal.opcoesDeCaminho) {
@@ -587,3 +620,40 @@ window.addEventListener("mousedown", () => {
     });
   }
 });
+
+function checkBoardClick(mouseX, mouseY) {
+  const centroX = 160;
+  const POS_VOLUME_Y = 70;
+
+  // Verifica se o clique foi na altura correta dos botões de volume
+  if (Math.abs(mouseY - (POS_VOLUME_Y - 15)) < 40) {
+    // Clique no ícone de Mute
+    if (
+      mouseX > centroX - DISTANCIA_X_UI * 1.5 - 40 &&
+      mouseX < centroX - DISTANCIA_X_UI * 1.5 + 40
+    )
+      return "mudar_mudo";
+      
+    // Clique no botão menos (-)
+    if (
+      mouseX > centroX - DISTANCIA_X_UI * 0.5 - 40 &&
+      mouseX < centroX - DISTANCIA_X_UI * 0.5 + 40
+    )
+      return "diminuir";
+      
+    // Clique no botão mais (+)
+    if (
+      mouseX > centroX + DISTANCIA_X_UI * 1.5 - 40 &&
+      mouseX < centroX + DISTANCIA_X_UI * 1.5 + 40
+    )
+      return "aumentar";
+  }
+  
+  // Se clicou no botão do Dado (opcional, caso queira validar aqui depois)
+  if (mouseX > 860 && mouseX < 1060 && mouseY > 950 && mouseY < 1010) {
+      return "rolar_dado";
+  }
+
+  return null;
+}
+

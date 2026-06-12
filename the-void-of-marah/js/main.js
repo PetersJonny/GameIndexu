@@ -96,6 +96,9 @@ const assets = {
   pesos: new Image(),
   siri: new Image(),
   tetris: new Image(),
+  fundoCombat: new Image(),
+  mayaCombat: new Image(), 
+  zeckCombat: new Image(),
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
@@ -151,7 +154,9 @@ assets.oniguiri.src = "assets/pixel_art/gacha/oniguiri.png";
 assets.pesos.src = "assets/pixel_art/gacha/pesos.png";
 assets.siri.src = "assets/pixel_art/gacha/Siri.png";
 assets.tetris.src = "assets/pixel_art/gacha/tetris.png";
-
+assets.fundoCombat.src = "assets/bg/FundoCombat.png";
+assets.mayaCombat.src = "assets/drawings/chars/Combat/MayaCombat.png";
+assets.zeckCombat.src = "assets/drawings/chars/Combat/ZeckCombat.png";
 
 
 // Inicializa o módulo de cutscenes

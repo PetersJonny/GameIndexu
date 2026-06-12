@@ -29,7 +29,7 @@ function renderCombat(ctx, assets, state, mouseX, mouseY) {
     iniciarCombate(state);
   }
 
-  desenharCenarioCombate(ctx, state);
+  desenharCenarioCombate(ctx, assets, state);
   desenharJogador(ctx, assets, state);
   desenharHUDCombate(ctx, assets, state); // <--- CORRIGIDO: Passando assets aqui
   desenharBotoesAcao(ctx, state); 
@@ -40,8 +40,9 @@ function desenharInimigos(ctx, assets, state) { // <--- CORRIGIDO: Recebendo ass
   const combat = state.combat;
   if (!combat) return;
 
-  const enemyX = 1250;
-  const enemyY = 80;
+  // Diminuímos o X para 1350 para puxar ele mais para a esquerda
+  const enemyX = 1350; 
+  const enemyY = 20;   
   const enemyW = 350;
   const enemyH = 350;
 
@@ -205,28 +206,52 @@ function desenharCenarioCombate(ctx, state) {
   ctx.fillStyle = "#e0e6f4";
   ctx.fillRect(50, 50, 1820, 980);
 
+  // Quadrado base/chão para o Jogador ficar em cima
   ctx.fillStyle = "#c8d6e5"; 
   ctx.fillRect(450, 400, 350, 350);
 }
 
 function desenharJogador(ctx, assets, state) {
+  // Posição e tamanho sincronizados com a área designada ao jogador (X: 450, Y: 400)
   const playerX = 450;
   const playerY = 400;
   const playerW = 350;
   const playerH = 350;
 
   let imgJogador = null;
+
+  // Verifica qual string de id foi salva no state.personagemSelecionado (ex: "maya" ou "zeck")
+  // e mapeia para os assets de Chibi carregados no main.js (card3 e card4)
   const idPersonagem = state.personagemSelecionado?.toLowerCase();
 
   if (idPersonagem === "maya") {
-    imgJogador = assets.mayaCombat;
+    imgJogador = assets.card3; // MayaChibiTab.png
   } else if (idPersonagem === "zeck") {
-    imgJogador = assets.zeckCombat;
+    imgJogador = assets.card4; // ZeckChibiTab.png
   }
 
   if (imgJogador && imgJogador.complete && imgJogador.src !== window.location.href) {
+    
+    // Mantém a proporção matemática com a nova altura gigante
+    playerW = imgJogador.width * (playerH / imgJogador.height);
+    
+    // Trava o centro do personagem no mesmo eixo X de antes (pixel 625)
+    playerX = 625 - (playerW / 2);
+
+    // Liga a suavização de alta qualidade
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    
     ctx.drawImage(imgJogador, playerX, playerY, playerW, playerH);
+    
+    ctx.restore();
+
   } else {
+    // Fallback visual caso o asset não esteja pronto ou não combine com as strings acima
+    ctx.fillStyle = "#341f97";
+    ctx.fillRect(playerX + 50, playerY + 50, playerW - 100, playerH - 100);
+    
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 24px Consolas, monospace";
     ctx.textAlign = "center";

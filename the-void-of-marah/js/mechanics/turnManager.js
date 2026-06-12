@@ -1,4 +1,3 @@
-// Controla o fluxo de combate, gerando inimigos, criando o estado de batalha e processando ataques.
 
 const TURN_STATES = {
   PLAYER: "playerTurn",
@@ -69,14 +68,26 @@ function getEnemyTemplate(state) {
 // Cria o estado inicial da batalha baseado no estado global do jogo.
 function createCombatState(state) {
   if (!state) {
-    throw new Error("turnManager.createCombatState requer um estado global válido.");
+    throw new Error(
+      "turnManager.createCombatState requer um estado global válido.",
+    );
   }
 
-  const player = new Player("Jogador", state.stats.vidaMax, state.stats.ataque, state.stats.defesa);
+  const player = new Player(
+    "Jogador",
+    state.stats.vidaMax,
+    state.stats.ataque,
+    state.stats.defesa,
+  );
   player.hp = Math.max(1, Math.min(state.stats.vidaMax, state.stats.vida));
 
   const enemyData = getEnemyTemplate(state);
-  const enemy = new Enemy(enemyData.name, enemyData.hp, enemyData.attack, enemyData.defense);
+  const enemy = new Enemy(
+    enemyData.name,
+    enemyData.hp,
+    enemyData.attack,
+    enemyData.defense,
+  );
 
   const battle = {
     player,
@@ -135,9 +146,10 @@ function finalizeBattle(battle, state, venceu) {
   syncBattleSnapshot(battle, state);
 
   if (venceu) {
-    const itemRecebido = state?.itemReward && state.combatHouseType === "combat"
-      ? { ...state.itemReward }
-      : null;
+    const itemRecebido =
+      state?.itemReward && state.combatHouseType === "combat"
+        ? { ...state.itemReward }
+        : null;
 
     if (itemRecebido) {
       battle.itemRecebido = itemRecebido;
@@ -146,7 +158,8 @@ function finalizeBattle(battle, state, venceu) {
       }
 
       const jaTem = state.colecionaveis.some(
-        item => item.nome === itemRecebido.nome
+        item => item.nome === itemRecebido.nome,
+        (item) => item.nome === itemRecebido.nome,
       );
 
       if (!jaTem) {
@@ -166,14 +179,17 @@ function finalizeBattle(battle, state, venceu) {
 }
 
 // Executa a ação do jogador e trata o contra-ataque do inimigo.
-function handlePlayerAction(state, ataqueEscolhido) { // <--- Adicione aqui!
+function handlePlayerAction(state, ataqueEscolhido) {
+  // <--- Adicione aqui!
   const battle = state?.combat;
   if (!battle || battle.finalizado) return false;
 
   // --- JOGADOR ATACA ---
   // Pega o dano puro direto do ataque selecionado
-  const damageDealt = battle.enemy.receiveAttack(battle.player.attackValue(ataqueEscolhido.dano));
-  
+  const damageDealt = battle.enemy.receiveAttack(
+    battle.player.attackValue(ataqueEscolhido.dano),
+  );
+
   // Agora a mensagem fala o nome do golpe correto
   battle.mensagem = `Você usou ${ataqueEscolhido.nome} em ${battle.enemy.name} e causou ${damageDealt} de dano.`;
   syncBattleSnapshot(battle, state);
@@ -186,8 +202,10 @@ function handlePlayerAction(state, ataqueEscolhido) { // <--- Adicione aqui!
   // --- INIMIGO CONTRA-ATACA ---
   // Inimigo ataca usando apenas a força base dele (+0 de bônus)
   const poderInimigo = 0;
-  const enemyDamage = battle.player.receiveAttack(battle.enemy.attackValue(poderInimigo));
-  
+  const enemyDamage = battle.player.receiveAttack(
+    battle.enemy.attackValue(poderInimigo),
+  );
+
   battle.turn = TURN_STATES.ENEMY;
   battle.estado = battle.turn;
   battle.mensagem += `\n${battle.enemy.name} contra-atacou e causou ${enemyDamage} de dano.`;

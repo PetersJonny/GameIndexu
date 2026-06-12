@@ -1,4 +1,3 @@
-// Ponto de entrada principal: inicializa canvas, estado global e faz o loop do jogo.
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -62,8 +61,10 @@ const assets = {
   cardGachaAtk: new Image(),
   cardGachaDef: new Image(),
   fundoGacha: new Image(),
-  musica_de_fundo: new Audio("assets/sounds/phantasticbeats-rpg-city-8381.mp3"), 
-  musica_de_inicial: new Audio("assets/sounds/rubyzephyr-fantasy-rpg-exploration-v2-461303.mp3"),
+  musica_de_fundo: new Audio("assets/sounds/phantasticbeats-rpg-city-8381.mp3"),
+  musica_de_inicial: new Audio(
+    "assets/sounds/rubyzephyr-fantasy-rpg-exploration-v2-461303.mp3",
+  ),
   crystalSerpent: new Image(),
   eclipseQueen: new Image(),
   reiEspiral: new Image(),
@@ -95,7 +96,7 @@ const assets = {
   siri: new Image(),
   tetris: new Image(),
   fundoCombat: new Image(),
-  mayaCombat: new Image(), 
+  mayaCombat: new Image(),
   zeckCombat: new Image(),
   omnitrix: new Image(),
 };
@@ -155,7 +156,6 @@ assets.fundoCombat.src = "assets/bg/FundoCombat.png";
 assets.mayaCombat.src = "assets/drawings/chars/Combat/MayaCombat.png";
 assets.zeckCombat.src = "assets/drawings/chars/Combat/ZeckCombat.png";
 assets.omnitrix.src = "assets/pixel_art/gacha/omnitrix.png";
-
 
 // Inicializa o módulo de cutscenes
 inicializarCutscenes();

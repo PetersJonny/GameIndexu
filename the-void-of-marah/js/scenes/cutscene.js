@@ -26,6 +26,7 @@ const configCutscene = {
     "assets/drawings/cutscenes/DecimaOitavaCutscene.png",
     "assets/drawings/cutscenes/DecimaNonaCutscene.png",
     "assets/drawings/cutscenes/VigesimaCutscene.png",
+    "assets/drawings/cutscenes/CutsceneTutorial.png",
   ],
   cenaDestinoFinal: "selecao",
 };
@@ -38,6 +39,11 @@ let estadoCutscene = {
   fadeVelocidade: 0.02, // Ajuste aqui: quanto menor, mais lento o fade
   larguraNativa: 1920,
   alturaNativa: 1080,
+
+  // Variáveis para o efeito de piscar do texto de indicação
+  textoOpacidade: 0,
+  textoDirecaoFade: 1,
+  textoVelocidade: 0.03,
 };
 
 function inicializarCutscenes() {
@@ -66,7 +72,7 @@ function renderCutscene(ctx) {
 
   if (!estadoCutscene.carregadas) return;
 
-  // Lógica do Fade-in
+  // Lógica do Fade-in da Imagem
   if (estadoCutscene.opacidade < 1) {
     estadoCutscene.opacidade += estadoCutscene.fadeVelocidade;
   }
@@ -85,6 +91,36 @@ function renderCutscene(ctx) {
     );
     ctx.restore();
   }
+
+  // --- Nova seção: Indicador de Clique ---
+  // Só exibe o texto após a imagem terminar de aparecer (fade-in concluído)
+  if (estadoCutscene.opacidade >= 1) {
+    // Lógica do efeito "Pulse/Piscar" para o texto
+    estadoCutscene.textoOpacidade +=
+      estadoCutscene.textoVelocidade * estadoCutscene.textoDirecaoFade;
+
+    if (estadoCutscene.textoOpacidade >= 1) {
+      estadoCutscene.textoOpacidade = 1;
+      estadoCutscene.textoDirecaoFade = -1; // Começa a sumir
+    } else if (estadoCutscene.textoOpacidade <= 0.2) {
+      // Não some 100% para manter legível
+      estadoCutscene.textoOpacidade = 0.2;
+      estadoCutscene.textoDirecaoFade = 1; // Começa a aparecer
+    }
+
+    ctx.save();
+    ctx.globalAlpha = estadoCutscene.textoOpacidade;
+    ctx.fillStyle = "white";
+    ctx.font = "24px sans-serif"; // Ajuste a fonte se tiver uma customizada no seu jogo
+    ctx.textAlign = "right";
+
+    // Posiciona o texto a 50px de distância das bordas inferior e direita
+    const posX = estadoCutscene.larguraNativa - 50;
+    const posY = estadoCutscene.alturaNativa - 50;
+
+    ctx.fillText("Clique para avançar...", posX, posY);
+    ctx.restore();
+  }
 }
 
 function checkCutsceneClick() {
@@ -99,9 +135,11 @@ function checkCutsceneClick() {
   if (estadoCutscene.indiceAtual >= estadoCutscene.imagens.length) {
     estadoCutscene.indiceAtual = 0;
     estadoCutscene.opacidade = 0;
+    estadoCutscene.textoOpacidade = 0; // Reseta o texto
     return "proxima_cena";
   }
 
   estadoCutscene.opacidade = 0; // Reseta opacidade para o fade da próxima imagem
+  estadoCutscene.textoOpacidade = 0; // Reseta o texto para a próxima tela
   return null;
 }

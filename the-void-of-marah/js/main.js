@@ -105,6 +105,7 @@ const assets = {
   chaosWisp: new Image(),
   marah: new Image(),
   abyssalArcher: new Image(),
+  ironGolem: new Image(),
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";

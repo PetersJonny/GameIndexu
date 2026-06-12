@@ -524,8 +524,7 @@ function continuarDepoisDoCombate(state) {
   const combat = state.combat;
   if (!combat || !combat.finalizado) return;
 
-  // 1. GARANTIA ABSOLUTA DO TABULEIRO: 
-  // Forçamos o estado de controle de movimento a liberar o dado antes de mudar de cena.
+  // 1. Configura as flags padrão para o próximo frame
   if (typeof controleMovimento !== 'undefined') {
     controleMovimento.dadoAtivo = true;
     controleMovimento.esperandoEscolha = false;
@@ -538,64 +537,66 @@ function continuarDepoisDoCombate(state) {
       state.fase = 2;
       state.casaAtual = 0;
       state.opcoesDeCaminho = [];
-      if (typeof controleMovimento !== 'undefined') {
-        controleMovimento.passosRestantes = 0;
-        controleMovimento.casaOrigem = null;
-        controleMovimento.casaDestino = null;
-      }
+      if (typeof controleMovimento !== 'undefined') controleMovimento.passosRestantes = 0;
       state.bossTransition = null;
     } else if (state.bossTransition === "paraFase3") {
       state.fase = 3;
       state.casaAtual = 0;
       state.opcoesDeCaminho = [];
-      if (typeof controleMovimento !== 'undefined') {
-        controleMovimento.passosRestantes = 0;
-        controleMovimento.casaOrigem = null;
-        controleMovimento.casaDestino = null;
-      }
+      if (typeof controleMovimento !== 'undefined') controleMovimento.passosRestantes = 0;
       state.bossTransition = null;
     } else if (state.bossTransition === "reiniciar") {
       state.casaAtual = 0;
       state.opcoesDeCaminho = [];
-      if (typeof controleMovimento !== 'undefined') {
-        controleMovimento.passosRestantes = 0;
-        controleMovimento.casaOrigem = null;
-        controleMovimento.casaDestino = null;
-      }
+      if (typeof controleMovimento !== 'undefined') controleMovimento.passosRestantes = 0;
       state.bossTransition = null;
     } else {
       state.bossTransition = null;
-      
-      // SE FOR INIMIGO COMUM:
       if (typeof controleMovimento !== 'undefined') {
         if (controleMovimento.passosRestantes <= 0) {
           controleMovimento.dadoAtivo = true;
         } else {
-          // Se ainda tinha passos, o tabuleiro continua andando, o dado não deve aparecer ainda
           controleMovimento.dadoAtivo = false; 
           controleMovimento.esperandoEscolha = (state.opcoesDeCaminho && state.opcoesDeCaminho.length > 1);
         }
       }
     }
   } else {
-    // Se perdeu, volta pro início da fase atual e libera o dado
     state.stats.vida = state.stats.vidaMax;
     state.casaAtual = 0;
     state.opcoesDeCaminho = [];
-    if (typeof controleMovimento !== 'undefined') {
-      controleMovimento.passosRestantes = 0;
-      controleMovimento.casaOrigem = null;
-      controleMovimento.casaDestino = null;
-    }
+    if (typeof controleMovimento !== 'undefined') controleMovimento.passosRestantes = 0;
     state.bossTransition = null;
   }
 
-  // 2. ADICIONA UMA COLA DE SEGURANÇA NO STATE GLOBAL
-  // Se o seu main.js ler o state para renderizar o dado, essa flag vai impedir que ele suma.
-  state.forçarExibicaoDado = true; 
-  state.dadoAtivo = true; 
+  // 2. O PULO DO GATO: Injeta uma função de força bruta que vai rodar repetidamente 
+  // no loop do jogo durante os próximos frames para impedir que o tabuleiro suma com o dado!
+  state.forçarExibicaoDado = true;
+  state.dadoAtivo = true;
 
-  // Limpa o estado de combate para o tabuleiro não achar que ainda estamos lutando
+  let checagensRestantes = 30; // Garante a trava ativa por 30 frames após a transição
+  
+  const forcarDadoNoTabuleiro = () => {
+    if (typeof controleMovimento !== 'undefined') {
+      // Se ainda restarem passos de um monstro comum no meio do caminho, respeita o fluxo
+      if (combat.venceu && !state.bossTransition && controleMovimento.passosRestantes > 0) {
+        return; 
+      }
+      // Caso contrário, força o dado a ficar visível e ativo
+      controleMovimento.dadoAtivo = true;
+    }
+    state.dadoAtivo = true;
+    
+    checagensRestantes--;
+    if (checagensRestantes > 0) {
+      requestAnimationFrame(forcarDadoNoTabuleiro);
+    }
+  };
+  
+  // Dispara a força bruta
+  requestAnimationFrame(forcarDadoNoTabuleiro);
+
+  // Finaliza a cena de combate e envia para o tabuleiro
   state.combat = null; 
   state.proximaCena = "jogo";
   state.emTransicao = true;

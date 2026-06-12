@@ -247,24 +247,25 @@ function renderBoard(ctx, assets, state, mouseX, mouseY) {
   processarMovimentoBoard(state, mapa);
   renderPersonagem(ctx, assets, state, mapa);
   renderHUD(ctx, state);
-
-  if (
-    controleMovimento.passosRestantes === 0 &&
-    !controleMovimento.esperandoEscolha &&
-    !controleMovimento.dadoAtivo &&
-    !controleMovimento.animandoPulo
-  ) {
-    ctx.save();
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-    ctx.fillRect(860, 950, 200, 60);
-    ctx.fillStyle = "black";
-    ctx.font = "bold 24px Arial";
-    ctx.fillText("ROLAR DADO", 960, 980);
-    ctx.restore();
+  if (state.cena === "jogo" && !state.emTransicao) {
+    if (controleMovimento.passosRestantes <= 0 && !controleMovimento.animandoPulo) {
+      // Força a limpeza de estados antigos para garantir a jogabilidade
+      if (controleMovimento.dadoAtivo && !document.getElementById("dado-container")?.style.display === "block") {
+        controleMovimento.dadoAtivo = false;
+      }
+      if (!controleMovimento.esperandoEscolha) {
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.fillRect(860, 950, 200, 60);
+        ctx.fillStyle = "black";
+        ctx.font = "bold 24px Arial";
+        ctx.fillText("ROLAR DADO", 960, 980);
+        ctx.restore();
+      }
+    }
   }
-
   //BUTAUM VOLUME
   const centroX = 160;
   const POS_VOLUME_Y = 70;
@@ -286,43 +287,48 @@ function renderBoard(ctx, assets, state, mouseX, mouseY) {
 }
 
 function rolarDado() {
-  if (
-    controleMovimento.passosRestantes > 0 ||
-    controleMovimento.esperandoEscolha ||
-    controleMovimento.dadoAtivo ||
-    controleMovimento.animandoPulo
-  )
-    return;
+  // --- INJEÇÃO DE SEGURANÇA: Limpa travas antigas para permitir a rolagem sempre ---
+  controleMovimento.esperandoEscolha = false;
+  controleMovimento.animandoPulo = false;
+  controleMovimento.puloProgresso = 0;
+  
+  // Ativa a flag de controle do dado
   controleMovimento.dadoAtivo = true;
+
   const container = document.getElementById("dado-container");
   const dado = document.getElementById("dado");
+  
+  if (!container || !dado) {
+    // Fallback caso o HTML do dado não seja encontrado: anda sem animação 3D
+    console.warn("Elementos HTML do dado não foram encontrados!");
+    const resultadoFallback = Math.floor(Math.random() * 6) + 1;
+    controleMovimento.passosRestantes = resultadoFallback;
+    controleMovimento.dadoAtivo = false;
+    return;
+  }
+
+  // Configura e inicia a animação 3D do CSS
   container.style.display = "block";
+  dado.classList.remove("rolando");
+  void dado.offsetWidth; // Truque para resetar a animação do CSS instantaneamente
   dado.classList.add("rolando");
+
   const resultado = Math.floor(Math.random() * 6) + 1;
+
   setTimeout(() => {
     dado.classList.remove("rolando");
     switch (resultado) {
-      case 1:
-        dado.style.transform = "rotateY(0deg)";
-        break;
-      case 6:
-        dado.style.transform = "rotateY(180deg)";
-        break;
-      case 3:
-        dado.style.transform = "rotateY(-90deg)";
-        break;
-      case 4:
-        dado.style.transform = "rotateY(90deg)";
-        break;
-      case 2:
-        dado.style.transform = "rotateX(-90deg)";
-        break;
-      case 5:
-        dado.style.transform = "rotateX(90deg)";
-        break;
+      case 1: dado.style.transform = "rotateY(0deg)"; break;
+      case 6: dado.style.transform = "rotateY(180deg)"; break;
+      case 3: dado.style.transform = "rotateY(-90deg)"; break;
+      case 4: dado.style.transform = "rotateY(90deg)"; break;
+      case 2: dado.style.transform = "rotateX(-90deg)"; break;
+      case 5: dado.style.transform = "rotateX(90deg)"; break;
     }
+
     setTimeout(() => {
       container.style.display = "none";
+      // Define os passos que o jogador vai andar baseado no resultado do dado
       controleMovimento.passosRestantes = resultado;
       controleMovimento.dadoAtivo = false;
     }, 1000);
@@ -560,9 +566,10 @@ function escurecerCor(hex, amt) {
   );
 }
 
-window.addEventListener("mousedown", () => {
-  if (!stateGlobal || stateGlobal.cena !== "jogo") return;  
-  // Botão Rolar Dado
+window.addEventListener("mousedown", (event) => {
+  if (!stateGlobal || stateGlobal.cena !== "jogo" || event.button !== 0) return;  
+
+  // --- 1. Verificação do Botão de Rolar Dado principal ---
   if (
     controleMovimento.passosRestantes === 0 &&
     !controleMovimento.esperandoEscolha &&
@@ -580,30 +587,27 @@ window.addEventListener("mousedown", () => {
     }
   }
   
-   const acao = checkBoardClick(mousePos.x, mousePos.y);
-    
-    if (acao === "mudar_mudo") {
-      alternarMute();
-    } else if (acao === "aumentar") {
-      if (state.volume < 10) state.volume++;
-      state.mutado = false;
-    } else if (acao === "diminuir") {
-      if (state.volume > 0) state.volume--;
-      if (state.volume === 0) state.mutado = true;
-    } else if (acao === "rolar_dado") {
-      // Aqui você pode disparar a função que rola o seu dado!
-      console.log("Dado clicado!"); 
-    }
+  // --- 2. Verificação da UI de Volume (Corrigido para usar mouseXGlobal) ---
+  const acao = checkBoardClick(mouseXGlobal, mouseYGlobal);
+  
+  if (acao === "mudar_mudo") {
+    if (typeof alternarMute === "function") alternarMute();
+  } else if (acao === "aumentar") {
+    if (stateGlobal.volume < 10) stateGlobal.volume++;
+    stateGlobal.mutado = false;
+  } else if (acao === "diminuir") {
+    if (stateGlobal.volume > 0) stateGlobal.volume--;
+    if (stateGlobal.volume === 0) stateGlobal.mutado = true;
+  } else if (acao === "rolar_dado") {
+    rolarDado();
+    return;
+  }
 
-  // Correção aqui: Adicionamos a verificação de segurança stateGlobal.opcoesDeCaminho
+  // --- 3. Escolha de caminhos em bifurcações ---
   if (controleMovimento.esperandoEscolha && stateGlobal.opcoesDeCaminho) {
     const mapa = getMapaFluxo(stateGlobal);
     mapa.casas.forEach((casa) => {
-      // Verificamos se o array existe e se contém o ID
-      if (
-        stateGlobal.opcoesDeCaminho &&
-        stateGlobal.opcoesDeCaminho.includes(casa.id)
-      ) {
+      if (stateGlobal.opcoesDeCaminho && stateGlobal.opcoesDeCaminho.includes(casa.id)) {
         const dx = Math.abs(mouseXGlobal - casa.x) / (LARGURA_PISO / 2);
         const dy = Math.abs(mouseYGlobal - casa.y) / (ALTURA_PISO / 2);
 

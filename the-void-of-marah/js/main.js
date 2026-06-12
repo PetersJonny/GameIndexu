@@ -75,6 +75,11 @@ const assets = {
   viperMage: new Image(),
   voidStalker: new Image(),
   wraith: new Image(),
+  pocao_cura: new Image(),
+  escudo: new Image(),
+  lamina_rapida: new Image(),
+  elixir_vigor: new Image(),
+  aco_refinado: new Image(),
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
@@ -109,6 +114,11 @@ assets.spectralKnight.src = "assets/drawings/bosses/SpectralKnightCombat.png";
 assets.viperMage.src = "assets/drawings/bosses/ViperMageCombat.png";
 assets.voidStalker.src = "assets/drawings/bosses/VoidStalkerCombat.png";
 assets.wraith.src = "assets/drawings/bosses/WraithCombat.png";
+assets.pocao_cura.src = "assets/pixel_art/gacha/maçã_do_amor.png"; // Usando a maçã como poção de cura
+assets.escudo.src = "assets/pixel_art/gacha/escudo.png";
+assets.lamina_rapida.src = "assets/pixel_art/gacha/lâmina_rápida.png";
+assets.elixir_vigor.src = "assets/pixel_art/gacha/Elixir_de_Vigor.png";
+assets.aco_refinado.src = "assets/pixel_art/gacha/aço_refinado.png";
 
 
 

@@ -39,7 +39,7 @@ const ENEMIES_COMBAT_FASE3 = [
 const BOSS_BY_FASE = {
   1: { name: "Shadow Lord", hp: 25, attack: 8, defense: 4 },
   2: { name: "Eclipse Queen", hp: 32, attack: 10, defense: 5 },
-  3: { name: "Rei Espiral", hp: 40, attack: 12, defense: 6 },
+  3: { name: "Marah", hp: 40, attack: 12, defense: 6 },
 };
 
 // Retorna o template de inimigo apropriado para o estado atual.

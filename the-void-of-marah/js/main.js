@@ -81,6 +81,19 @@ const assets = {
   elixir_vigor: new Image(),
   aco_refinado: new Image(),
   fogo_das_almas: new Image(),
+  boblbleble: new Image(),
+  colar: new Image(),
+  estrela_com_palito: new Image(),
+  frigideira: new Image(),
+  guitarra: new Image(),
+  joker: new Image(),
+  lanterna: new Image(),
+  latinha: new Image(),
+  olhoMagico: new Image(),
+  oniguiri: new Image(),
+  pesos: new Image(),
+  siri: new Image(),
+  tetris: new Image(),
 };
 
 assets.fundo.src = "assets/drawings/titleScreenUI/background/TelaInicial.png";
@@ -121,6 +134,19 @@ assets.lamina_rapida.src = "assets/pixel_art/gacha/lâmina_rápida.png";
 assets.elixir_vigor.src = "assets/pixel_art/gacha/Elixir_de_Vigor.png";
 assets.aco_refinado.src = "assets/pixel_art/gacha/aço_refinado.png";
 assets.fogo_das_almas.src = "assets/pixel_art/gacha/fogo_das_almas.png";
+assets.boblbleble.src = "assets/pixel_art/gacha/boblbleble.png";
+assets.colar.src = "assets/pixel_art/gacha/colar-0001.png";
+assets.estrela_com_palito.src = "assets/pixel_art/gacha/estrela_com_palito.png";
+assets.frigideira.src = "assets/pixel_art/gacha/frigereda.png";
+assets.guitarra.src = "assets/pixel_art/gacha/guitarra.png";
+assets.joker.src = "assets/pixel_art/gacha/joker.png";
+assets.lanterna.src = "assets/pixel_art/gacha/lanterna.png";
+assets.latinha.src = "assets/pixel_art/gacha/latinha.png";
+assets.olhoMagico.src = "assets/pixel_art/gacha/olhoMagico.png";
+assets.oniguiri.src = "assets/pixel_art/gacha/oniguiri.png";
+assets.pesos.src = "assets/pixel_art/gacha/pesos.png";
+assets.siri.src = "assets/pixel_art/gacha/Siri.png";
+assets.tetris.src = "assets/pixel_art/gacha/tetris.png";
 
 
 

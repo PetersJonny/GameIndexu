@@ -385,18 +385,32 @@ function desenharHUDCombate(ctx, state) {
     ctx.fillText(item.nome || "Item exemplo", itemCardX + 30, itemCardY + 82);
 
     ctx.font = "18px Consolas, monospace";
-    ctx.fillText(item.descricao || "Espaço para trocar depois.", itemCardX + 30, itemCardY + 118, itemCardW - 70);
+    // Usando o wrapText e limitando a largura (maxWidth) para 280 pixels,
+    // assim o texto quebra de linha antes de encostar na caixa da imagem (X + 330)
+    wrapText(ctx, item.descricao || "Espaço para trocar depois.", itemCardX + 30, itemCardY + 118, 280, 22);
 
     ctx.fillStyle = "#f4f4f7";
     ctx.fillRect(itemCardX + 330, itemCardY + 30, 130, 100);
     ctx.strokeStyle = "#1f1f2b";
     ctx.strokeRect(itemCardX + 330, itemCardY + 30, 130, 100);
 
-    ctx.fillStyle = "#1f1f2b";
-    ctx.font = "bold 20px Consolas, monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("PNG", itemCardX + 395, itemCardY + 72);
-    ctx.fillText("aqui", itemCardX + 395, itemCardY + 102);
+    // Tenta buscar a imagem do item usando a propriedade imgId definida no array GACHA_ITENS
+    const imgItem = assets[item.imgId];
+    
+    // Se a imagem existir e já estiver carregada, desenha na tela
+    if (imgItem && imgItem.complete && imgItem.src !== window.location.href) {
+        // Desenha a imagem ocupando o espaço da caixa cinza (130x100)
+        // Se a pixel art ficar esticada, você pode ajustar as dimensões aqui.
+        ctx.drawImage(imgItem, itemCardX + 330, itemCardY + 30, 130, 100);
+    } else {
+        // Fallback caso a imagem não carregue
+        ctx.fillStyle = "#1f1f2b";
+        ctx.font = "bold 20px Consolas, monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("Sem", itemCardX + 395, itemCardY + 72);
+        ctx.fillText("Img", itemCardX + 395, itemCardY + 102);
+    }
+    
     ctx.restore();
 
     ctx.textAlign = "left";

@@ -12,21 +12,6 @@ const CASAS = {
   BOSS: { cor: "#9900ff" },
 };
 
-const ITENS_EXEMPLO_FASE1 = [
-  {
-    nome: "Fragmento Vermelho",
-    descricao: "Fragmento brilhante.",
-    imagem: null,
-  },
-  {
-    nome: "Bomba de Fumaça",
-    descricao: "Bomba de brinquedo. Será que funciona?",
-    imagem: null,
-  },
-  { nome: "Lâmina Brilhante", descricao: "Pedaço de estilete.", imagem: null },
-  { nome: "Escudo de Cinza", descricao: "Um escudo simples.", imagem: null },
-];
-
 let tempoFlutuacao = 0;
 
 let controleMovimento = {
@@ -81,11 +66,7 @@ function gerarMalhaOrganica() {
         tipo = CASAS.COMBAT;
       else if (idCounter % 9 === 0) tipo = CASAS.GACHA;
       else if (idCounter % 13 === 0) tipo = CASAS.RECOVERY;
-      const itemReward =
-        tipo === CASAS.COMBAT
-          ? { ...ITENS_EXEMPLO_FASE1[idCounter % ITENS_EXEMPLO_FASE1.length] }
-          : null;
-      casas.push({ id: idCounter, c, r, x, y, tipo, itemReward, proximas: [] });
+      casas.push({ id: idCounter, c, r, x, y, tipo, proximas: [] });
       idCounter++;
     }
   }
@@ -438,7 +419,22 @@ function aplicarEfeitoDaCasa(casa) {
   } else if (casa.tipo === CASAS.COMBAT) {
     if (stateGlobal) {
       stateGlobal.combatHouseType = "combat";
-      stateGlobal.itemReward = casa.itemReward || { ...ITENS_EXEMPLO_FASE1[0] };
+      
+      // --- CÓDIGO NOVO: Sorteando um colecionável aleatório para a recompensa ---
+      let itemSorteado = null;
+      if (typeof GACHA_ITENS !== 'undefined') {
+        // Filtra apenas os itens que são colecionáveis
+        const colecionaveis = GACHA_ITENS.filter(i => i.tipo === "colecionavel");
+        if (colecionaveis.length > 0) {
+          const randomIndex = Math.floor(Math.random() * colecionaveis.length);
+          // Cria uma cópia do item para não alterar a lista original
+          itemSorteado = { ...colecionaveis[randomIndex] }; 
+        }
+      }
+      
+      stateGlobal.itemReward = itemSorteado; // Entrega o item sorteado pro combate
+      // -------------------------------------------------------------------------
+
       stateGlobal.proximaCena = "combat";
       stateGlobal.emTransicao = true;
       stateGlobal.combat = null;
@@ -447,7 +443,7 @@ function aplicarEfeitoDaCasa(casa) {
   } else if (casa.tipo === CASAS.BOSS) {
     if (stateGlobal) {
       stateGlobal.combatHouseType = "boss";
-      stateGlobal.itemReward = null;
+      stateGlobal.itemReward = null; // Opcional: Você pode colocar um drop fixo pro boss aqui depois
       stateGlobal.proximaCena = "combat";
       stateGlobal.emTransicao = true;
       stateGlobal.combat = null;

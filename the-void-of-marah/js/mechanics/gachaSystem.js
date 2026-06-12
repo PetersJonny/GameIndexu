@@ -54,6 +54,110 @@ const GACHA_ITENS = [
     cor: "#ffe285",
     imgId: "fogo_das_almas" // <--- Imagem nova adicionada aqui!
   },
+  {
+    nome: "Bobblehead",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Um boneco cabeçudo muito curioso. Apenas colecionável.",
+    cor: "#ffffff",
+    imgId: "boblbleble"
+  },
+  {
+    nome: "Colar Misterioso",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Um colar antigo encontrado nas ruínas. Um belo adorno.",
+    cor: "#ffffff",
+    imgId: "colar"
+  },
+  {
+    nome: "Estrela com Palito",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Parece um adereço de fantasia. Brilha no escuro.",
+    cor: "#ffffff",
+    imgId: "estrela_com_palito"
+  },
+  {
+    nome: "Frigideira Velha",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Útil para fazer um lanche, mas inútil em batalha.",
+    cor: "#ffffff",
+    imgId: "frigideira"
+  },
+  {
+    nome: "Guitarra Quebrada",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Falta uma corda, mas ainda tem muito estilo.",
+    cor: "#ffffff",
+    imgId: "guitarra"
+  },
+  {
+    nome: "Carta Joker",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "O curinga do baralho. Quem sabe traga sorte?",
+    cor: "#ffffff",
+    imgId: "joker"
+  },
+  {
+    nome: "Lanterna Apagada",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Sem pilhas. Serve apenas como peso de papel.",
+    cor: "#ffffff",
+    imgId: "lanterna"
+  },
+  {
+    nome: "Latinha Vazia",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Alguém já tomou o refrigerante. Lixo de uns, tesouro de outros.",
+    cor: "#ffffff",
+    imgId: "latinha"
+  },
+  {
+    nome: "Olho Mágico",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Um cristal que parece te observar de volta.",
+    cor: "#ffffff",
+    imgId: "olhoMagico"
+  },
+  {
+    nome: "Oniguiri Frio",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Um lanche de arroz tradicional. Já está meio duro.",
+    cor: "#ffffff",
+    imgId: "oniguiri"
+  },
+  {
+    nome: "Pesos de Treino",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Pesados demais para usar durante uma luta de verdade.",
+    cor: "#ffffff",
+    imgId: "pesos"
+  },
+  {
+    nome: "Siri de Estimação",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Ele faz 'snip snip' com as garras. Muito simpático.",
+    cor: "#ffffff",
+    imgId: "siri"
+  },
+  {
+    nome: "Tetris",
+    tipo: "colecionavel",
+    valor: 0,
+    descricao: "Uma peça quadrada que não encaixa em lugar nenhum.",
+    cor: "#ffffff",
+    imgId: "tetris"
+  }
 ];
 
 // Retorna três itens aleatórios diferentes a partir da lista de gacha.

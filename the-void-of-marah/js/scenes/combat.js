@@ -64,7 +64,6 @@ function desenharInimigos(ctx, state) {
     case "Flame Bat": imgInimigo = assets.flameBat; break;
     case "Spectral Knight": imgInimigo = assets.spectralKnight; break;
     case "Viper Mage": imgInimigo = assets.viperMage; break;
-    case "Iron Golem":  imgInimigo = assets.ironGolem; break;
     case "Golem": imgInimigo = assets.golem; break;
     case "Crystal Serpent": imgInimigo = assets.crystalSerpent; break;
     case "Void Stalker": imgInimigo = assets.voidStalker; break;
@@ -73,6 +72,7 @@ function desenharInimigos(ctx, state) {
     case "Marah": imgInimigo = assets.marah; break;
     case "Chaos Wisp": imgInimigo = assets.chaosWisp; break;
     case "Abyssal Archer": imgInimigo = assets.abyssalArcher; break;
+    case "Iron Golem": imgInimigo = assets.ironGolem; break;
     default: imgInimigo = null;
   }
 

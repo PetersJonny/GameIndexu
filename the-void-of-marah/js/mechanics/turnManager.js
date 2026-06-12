@@ -23,7 +23,7 @@ const ENEMIES_COMBAT_FASE2 = [
   { name: "Flame Bat", hp: 14, attack: 6, defense: 2 },
   { name: "Spectral Knight", hp: 18, attack: 6, defense: 3 },
   { name: "Viper Mage", hp: 16, attack: 7, defense: 2 },
-  { name: "Iron Golem", hp: 20, attack: 7, defense: 4 },
+  { name: "Iron Golem", hp: 18, attack: 5, defense: 4 },
 ];
 
 // Inimigos comuns da fase 3.

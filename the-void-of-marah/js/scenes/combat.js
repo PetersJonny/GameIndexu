@@ -72,7 +72,6 @@ function desenharInimigos(ctx, state) {
     case "Marah": imgInimigo = assets.marah; break;
     case "Chaos Wisp": imgInimigo = assets.chaosWisp; break;
     case "Abyssal Archer": imgInimigo = assets.abyssalArcher; break;
-    case "Iron Golem": imgInimigo = assets.ironGolem; break;
     default: imgInimigo = null;
   }
 

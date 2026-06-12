@@ -100,92 +100,143 @@ function gerarMalhaOrganica() {
 }
 
 function gerarMalhaOrganicaFase2() {
+  // Novo layout estratégico: separa o caminho em "Rota de Cima" e "Rota de Baixo"
   const layoutGrid = [
-    [0],
-    [-1, 1],
-    [-2, 0, 2],
-    [-1, 1],
-    [0, 2, 4],
-    [1, 3],
-    [2, 4],
-    [1, 3, 5],
-    [2, 4],
-    [1, 3, 5],
-    [0, 2, 4],
-    [-1, 1, 3],
-    [-2, 0, 2],
-    [-1, 1],
-    [0],
+    [0],            // Col 0: Início
+    [-1, 1],        // Col 1: Primeira divisão
+    [-2, 0, 2],     // Col 2: Expansão
+    [-1, 1],        // Col 3: GARGALO DE COMBATE 1
+    [0],            // Col 4: Ponto de encontro único (Cura garantida)
+    [-1, 1],        // Col 5: Segunda divisão
+    [-2, 2],        // Col 6: ROTAS ISOLADAS (O meio sumiu, caminhos não se cruzam!)
+    [-3, -1, 1, 3], // Col 7: Expansão extrema
+    [-2, 0, 2],     // Col 8: Começa a juntar
+    [-1, 1],        // Col 9: GARGALO DE COMBATE 2
+    [-2, 2],        // Col 10: ROTAS ISOLADAS DE NOVO
+    [-3, -1, 1, 3], // Col 11: Expansão
+    [-2, 0, 2],     // Col 12: Começa a juntar pro final
+    [-1, 1],        // Col 13: GARGALO DE COMBATE 3 (Guarda-costas do Boss)
+    [0],            // Col 14: BOSS
   ];
+
   let casas = [];
   let idCounter = 0;
+
   for (let c = 0; c < layoutGrid.length; c++) {
     for (let i = 0; i < layoutGrid[c].length; i++) {
       let r = layoutGrid[c][i];
+
       let x = 130 + c * 120;
       let y = 520 + r * 55;
+
       let tipo = CASAS.NORMAL;
+
       if (c === 0) tipo = CASAS.CHECKPOINT;
-      else if (c === layoutGrid.length - 1) tipo = CASAS.BOSS;
-      else if (c === 6 && r === 4) tipo = CASAS.RECOVERY;
-      else if (c === 10 && r === 0) tipo = CASAS.RECOVERY;
+      else if (c === 14) tipo = CASAS.BOSS;
+      
+      // --- AS BARREIRAS DE COMBATE (Gargalos) ---
+      // O jogador é forçado a escolher um dos monstros para avançar
+      else if (c === 3 || c === 9 || c === 13) {
+        tipo = CASAS.COMBAT;
+      }
+      // --- PONTO DE DESCANSO APÓS A PRIMEIRA LUTA ---
+      else if (c === 4) {
+        tipo = CASAS.RECOVERY;
+      }
+      // --- PRIMEIRA CASA GACHA FORÇADA (Rota de Baixo - Meio) ---
+      else if (c === 8 && r === 2) {
+        tipo = CASAS.GACHA;
+      }
+      // --- SEGUNDA CASA GACHA FORÇADA (Rota de Baixo - Direita) ---
+      else if (c === 12 && r === 2) {
+        tipo = CASAS.GACHA;
+      }
+      // Casas aleatórias baseadas no ID
       else if (idCounter % 7 === 0) tipo = CASAS.GACHA;
-      else if (idCounter % 5 === 0) tipo = CASAS.COMBAT;
       else if (idCounter % 11 === 0) tipo = CASAS.RECOVERY;
+
       casas.push({ id: idCounter, c, r, x, y, tipo, proximas: [] });
       idCounter++;
     }
   }
+
   casas.forEach((casa) => {
     let casasNaProximaColuna = casas.filter((n) => n.c === casa.c + 1);
     casasNaProximaColuna.forEach((proxima) => {
-      if (proxima.r === casa.r - 1 || proxima.r === casa.r + 1)
+      // A regra de conexão "r-1 ou r+1" brilha muito aqui com as rotas isoladas
+      if (proxima.r === casa.r - 1 || proxima.r === casa.r + 1) {
         casa.proximas.push(proxima.id);
+      }
     });
   });
+
   return casas;
 }
 
 function gerarMalhaOrganicaFase3() {
   const layoutGrid = [
-    [0],
-    [-1, 1],
-    [-2, 0, 2],
-    [-3, -1, 1, 3],
-    [-4, 0, 4],
-    [-3, -1, 1, 3],
-    [-4, -2, 2, 4],
-    [-3, 1, 3],
-    [-2, 0, 2],
-    [-1, 1],
-    [0],
+    [0],            // Col 0
+    [-1, 1],        // Col 1
+    [-2, 0, 2],     // Col 2
+    [-3, -1, 1, 3], // Col 3
+    [-4, 0, 4],     // Col 4
+    [-3, -1, 1, 3], // Col 5
+    [-4, -2, 2, 4], // Col 6
+    [-3, 1, 3],     // Col 7
+    [-2, 0, 2],     // Col 8
+    [-1, 1],        // Col 9 (Os dois últimos pisos antes do boss)
+    [0],            // Col 10 (Boss)
   ];
+  
   let casas = [];
   let idCounter = 0;
+  
   for (let c = 0; c < layoutGrid.length; c++) {
     for (let i = 0; i < layoutGrid[c].length; i++) {
       let r = layoutGrid[c][i];
       let x = 350 + c * 120;
       let y = 520 + r * 55;
+      
       let tipo = CASAS.NORMAL;
+
+      // --- LÓGICA PADRÃO DA FASE ---
       if (c === 0) tipo = CASAS.CHECKPOINT;
       else if (c === layoutGrid.length - 1) tipo = CASAS.BOSS;
-      else if (c === 7 && r === 1) tipo = CASAS.RECOVERY;
       else if (c === 4 && r === 0) tipo = CASAS.RECOVERY;
       else if (idCounter % 8 === 0) tipo = CASAS.GACHA;
       else if (idCounter % 5 === 0) tipo = CASAS.COMBAT;
       else if (idCounter % 10 === 0) tipo = CASAS.RECOVERY;
+
+      // =========================================================
+      // --- CUSTOMIZAÇÕES MANUAIS DE LEVEL DESIGN ---
+      // =========================================================
+      
+      // 1. "tirar esse monstro perto do personagem em baixo e botar la encima antes do gacha"
+      if (c === 2 && r === 2) tipo = CASAS.NORMAL;  // Apaga o Vermelho de baixo
+      if (c === 2 && r === -2) tipo = CASAS.COMBAT; // Coloca o Vermelho lá em cima (Rota Topo)
+
+      // 2. "tirar vermelho e verde perto do boss..."
+      if (c === 7 && r === 1) tipo = CASAS.NORMAL; // Apaga o Verde antigo
+      if (c === 8 && r === 0) tipo = CASAS.NORMAL; // Apaga o Vermelho antigo
+      
+      // "... e botando nessa mesma ordem nos pisos da direita" (Coluna 9)
+      if (c === 9 && r === -1) tipo = CASAS.COMBAT;   // Vermelho na direita superior
+      if (c === 9 && r === 1) tipo = CASAS.RECOVERY;  // Verde na direita inferior
+
       casas.push({ id: idCounter, c, r, x, y, tipo, proximas: [] });
       idCounter++;
     }
   }
+  
   casas.forEach((casa) => {
     let casasNaProximaColuna = casas.filter((n) => n.c === casa.c + 1);
     casasNaProximaColuna.forEach((proxima) => {
-      if (proxima.r === casa.r - 1 || proxima.r === casa.r + 1)
+      if (proxima.r === casa.r - 1 || proxima.r === casa.r + 1) {
         casa.proximas.push(proxima.id);
+      }
     });
   });
+  
   return casas;
 }
 
